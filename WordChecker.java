@@ -145,6 +145,11 @@ public class WordChecker {
         
     }
 
+    public List<String> getCurrentValidWordMap(){
+        return this.currentValidWordMap;
+    }
+
+
     public int getValidMapSize(){
         if(!this.currentlyUpdating){
             return this.orderedValidWordMap.size();
@@ -202,9 +207,9 @@ public class WordChecker {
         this.lockedChars[position] = newLockedChar;
 
         // //!new code might be broken
-        // if(this.possibleChars.contains(newLockedChar)){
-        //     this.possibleChars.remove(newLockedChar);
-        // }
+        if(this.possibleChars.indexOf(newLockedChar) != -1){
+            this.possibleChars.remove(this.possibleChars.indexOf(newLockedChar));
+        }
         
     }
 
@@ -245,10 +250,9 @@ public class WordChecker {
         //If character is not already in the list, adds character to the now reformed list
         invalidList.add(invalidChar);
         //Also remove it from the possibleLettersList
-        //! There is a chance this line could cause problems in the future
-        
-        if(this.possibleChars.contains(invalidChar)){
-            this.possibleChars.remove(invalidChar);
+        // There is a chance this line could cause problems in the future
+        if(this.possibleChars.indexOf(invalidChar) != -1){
+            this.possibleChars.remove(possibleChars.indexOf(invalidChar));
         }
         
         
@@ -269,18 +273,18 @@ public class WordChecker {
         }   
     }
 
-    private void addGreenChar(char greenChar, int positionFromZeroToFour){
+    public void addGreenChar(char greenChar, int positionFromZeroToFour){
         //Green Characters are in correct position already
         addLockedChar(greenChar, positionFromZeroToFour);
     }
 
-    private void addYellowChar(char yellowChar, int positionFromZeroToFour){
+    public void addYellowChar(char yellowChar, int positionFromZeroToFour){
         //Adds the character to the known char list
         addKnownChar(yellowChar);
         addInvalidChar(yellowChar, positionFromZeroToFour);
     }
 
-    private void addBlackChar(char blackChar){
+    public void addBlackChar(char blackChar){
         //Adds the new blackCharacter to all parameters relating to invalidity
         addInvalidChar(blackChar);   
     }
@@ -499,9 +503,9 @@ public class WordChecker {
             }
 
             // //! New line could be buggy
-            // if(possibleChars.contains(word.charAt(i))){
-            //     score += this.currentTotalLetterMap.get(word.charAt(i)) / 2;
-            // }
+            if(possibleChars.indexOf(word.charAt(i)) != -1){
+                score += this.currentTotalLetterMap.get(word.charAt(i)) / 2;
+            }
             
             //Points based on character being in other words at the same position
             for(int k = 0; k < this.currentValidWordMap.size(); k++){

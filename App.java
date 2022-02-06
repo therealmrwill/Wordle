@@ -1,5 +1,8 @@
 import java.io.PrintWriter;
+import java.net.CacheRequest;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 
 /**
@@ -8,19 +11,17 @@ import java.util.List;
 public class App {
 
     public static void main(String[] args) {
-        String baseFileString = "DebugTestFiles/FullWordList.txt";
-        String invalidFile = "DebugTestFiles/InvalidWords.txt";
-        String validFile = "DebugTestFiles/ValidWords.txt";
+        String baseFileString = "FullWordList.txt";
+        String invalidFile = "DebugFiles/InvalidWords.txt";
+        String validFile = "DebugFiles/ValidWords.txt";
+       
+        
 
-        WordChecker wordChecker = new WordChecker(baseFileString);
-
-        wordChecker.addWord("AEROS", "GBBYB");
-
-        debugFilePrinter(wordChecker.getOrderedValidWordMap(), validFile);
-        debugFilePrinter(wordChecker.getOrderedInvalidWordMap(), invalidFile);
         
 
         System.out.println("Completed!");
+        
+        
     }
 
     private static void debugFilePrinter(List<String> orderedValidWordMap, String scoreOrderedFile) {

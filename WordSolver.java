@@ -22,12 +22,15 @@ public class WordSolver {
     //* Output Params
     private Map<String, Integer> findableWordMap;
     private List<String> undetectedWordList;
+    private List<String> findableWordList;
 
 
     //* Constructors
     public WordSolver(String originFileName){
         // Creating a new instance of the WordChecker class
         this.wordChecker = new WordChecker(originFileName);
+
+        System.out.println("WordChecker constructed");
 
         //Testing Params
         this.baseWordMap = this.wordChecker.getCurrentValidWordMap();
@@ -36,6 +39,7 @@ public class WordSolver {
         //Output Params
         this.findableWordMap = new HashMap<>();
         this.undetectedWordList = new ArrayList<>();
+        this.findableWordList = new ArrayList<>();
 
     }
 
@@ -53,13 +57,24 @@ public class WordSolver {
     //* Main Public Methods
     public boolean runDataTest(){
        for (String wordToFind : this.baseWordMap) {
-           if(!wordFindable(wordToFind)){
-            this.undetectedWordList.add(wordToFind);
+           boolean wordFound = wordFindable(wordToFind);
+           if(wordFound){
+                this.findableWordList.add(wordToFind);
+           }else{
+                this.undetectedWordList.add(wordToFind);
            }
 
-           //Line is just for debug purposes
+           
+
+
+           //? Line is just for debug purposes
            System.out.println("Word:" + wordToFind + " sorted");
-       }
+        }
+
+       //For debug purposes only 
+       debugFilePrinter(this.undetectedWordList, "DebugFiles/UnsolvableWords.txt");
+       debugFilePrinter(this.findableWordList, "DebugFiles/FoundWords.txt");
+
 
        if(this.findableWordMap.size() == this.baseWordMapSize){
            return true;
@@ -76,14 +91,19 @@ public class WordSolver {
             String currentWord = getBestWord(i);
 
             if(currentWord != null && currentWord.equals(correctWord)){
-                this.findableWordMap.put(currentWord, i);
+                this.findableWordMap.put(currentWord, (i+1));
                 return true;
             }
             else if(currentWord != null){
                 //Update WordChecker
-                updateWordChecker(currentWord, correctWord);                
+                updateWordChecker(currentWord, correctWord);   
+
+
+                //? For debug purposes only
+                //debugFilePrinter(this.wordChecker.getOrderedValidWordMap(), "DebugFiles/ValidWords.txt");
             }
         }
+
 
         return false;
     }
@@ -106,6 +126,8 @@ public class WordSolver {
                 this.wordChecker.addBlackChar(currentChar);
             }    
         }
+
+        this.wordChecker.allDataUpdate();
     }
 
     private String getBestWord(int round) {
@@ -119,5 +141,42 @@ public class WordSolver {
         }
     }
 
-   
+    private static void debugFilePrinter(List<String> orderedValidWordMap, String scoreOrderedFile) {
+        PrintWriter pw = null;
+            final int LINE_LENGTH = 10;
+            int posInLine = 0;
+    
+            try {
+                pw = new PrintWriter(scoreOrderedFile);
+    
+                for(int i = orderedValidWordMap.size() - 1; i >= 0; i--){
+                    if(posInLine % LINE_LENGTH == 0 && posInLine != 0){
+                        pw.println("");
+                        posInLine++;
+                    }
+                    else{
+                        posInLine++;
+                    }
+    
+                    if(orderedValidWordMap.get(i) != null){
+                        pw.print(orderedValidWordMap.get(i) + "  ");
+                    }
+                    else{
+                        pw.print("*Error*");
+                    }
+    
+                }
+    
+            } catch (Exception e) {
+                System.err.println("Uh Oh");
+                e.printStackTrace();
+            } finally{
+                if(pw != null){
+                    pw.close();
+                }   
+            }
+
+
+
+    }
 }

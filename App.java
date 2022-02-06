@@ -16,16 +16,15 @@ public class App {
         String baseFileString = "FullWordList.txt";
         String invalidFile = "DebugFiles/InvalidWords.txt";
         String validFile = "DebugFiles/ValidWords.txt";
-        String unsolvableFile = "DebugFiles/UnsolvableWords.txt";
+        String unsolvableFile = "DebugFiles/OriginUndetectableWords.txt";
        
         WordSolver wordSolver = new WordSolver(fileToArray(baseFileString));
 
         //TODO: If score array is updated re-run the data sorted
         //Current unsolvable word list size 1,431
-        wordSolver.runDataTest(fileToArray(baseFileString));
+        wordSolver.runDataTest(fileToArray(unsolvableFile));
 
         //Enter a word and the program will figure out if it is attainable or not
-        //wordSolver.wordFindable("STING");
 
         
         System.out.println("Completed!");

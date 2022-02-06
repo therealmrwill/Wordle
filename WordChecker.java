@@ -460,9 +460,9 @@ public class WordChecker {
         //Set score to 0
         //Make a loop for letters in the word
             //Add points based on currentLetterMap
-            //? Add quarter points based on original letter map
+            //Points based on original letter map
             //Add points based on positioning maps
-            //? Add quarter points based on original positioning maps
+            //Points based on original positioning maps
             //Add half currentLetterMap points if letter is in known letters
             //Add points for every word in currentValidWordMap that contains character
             //Subtract if character is already invalid for that location (Should only affect invalid words)
@@ -476,9 +476,8 @@ public class WordChecker {
         for(int i = 0; i < word.length(); i++){
 
             //Points based on original maps
-            //? Still here in case I can use it later
-            // score += this.baseTotalLetterMap.get(word.charAt(i)) ;
-            // score += this.basePositionalLetterMapWrapper.get(i).get(word.charAt(i));
+            score += this.baseTotalLetterMap.get(word.charAt(i)) / (this.baseTotalLetterMap.size() / (double)this.currentTotalLetterMap.size());
+            score += this.basePositionalLetterMapWrapper.get(i).get(word.charAt(i)) / (this.baseTotalLetterMap.size() / (double)this.currentTotalLetterMap.size());
             
             //Points based on current maps
             score += this.currentTotalLetterMap.get(word.charAt(i));
@@ -494,8 +493,8 @@ public class WordChecker {
                 score += this.currentTotalLetterMap.get(word.charAt(i)) / 2;
             }
             
-            //TODO: Change this
-            score += this.wordsCharIsInMap.get(word.charAt(i));
+            //Points based on how many times the letter is in other words
+            score += this.wordsCharIsInMap.get(word.charAt(i)) * 2;
 
             
 

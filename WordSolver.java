@@ -74,6 +74,8 @@ public class WordSolver {
     //* Main Public Methods
     public boolean runDataTest(List<String> dataToTest){
        this.dataListSize = dataToTest.size(); 
+       int i = 0;
+       int currentPercent = 0;
        for (String wordToFind : dataToTest) {
            boolean wordFound = wordFindable(wordToFind);
            if(wordFound){
@@ -85,8 +87,18 @@ public class WordSolver {
            
 
 
-           //? Line is just for debug purposes
-           System.out.println("Word:" + wordToFind + " sorted");
+           //? Lines are just for debug purposes
+           if((int)(i / this.dataListSize * 100) != currentPercent && currentPercent % 10 == 0 && currentPercent != 0){
+            System.out.printf("%.0f%% completed %n", (i / this.dataListSize * 100) - 1);
+            currentPercent = (int)(i / this.dataListSize * 100);
+           }
+           else{
+            currentPercent = (int)(i / this.dataListSize * 100);
+           }
+           
+
+
+           i++;
         }
 
         dataTestResultsPrinter();       
@@ -166,7 +178,7 @@ public class WordSolver {
 
 
                 //? For debug purposes only
-                //debugFilePrinter(this.wordChecker.getOrderedValidWordMap(), "DebugFiles/ValidWords.txt");
+                debugFilePrinter(this.wordChecker.getOrderedValidWordMap(), "DebugFiles/ValidWords.txt");
             }
         }
 

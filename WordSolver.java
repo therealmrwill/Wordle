@@ -70,7 +70,7 @@ public class WordSolver {
 
     }
 
-    private boolean wordFindable(String correctWord) {
+    public boolean wordFindable(String correctWord) {
         this.wordChecker = new WordChecker(baseWordMap);
         for(int i = 0; i < NUM_OF_GUESSES; i++){
             String currentWord = getBestWord(i);

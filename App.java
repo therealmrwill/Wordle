@@ -15,9 +15,11 @@ public class App {
         String invalidFile = "DebugFiles/InvalidWords.txt";
         String validFile = "DebugFiles/ValidWords.txt";
        
-        
+        WordSolver wordSolver = new WordSolver(baseFileString);
 
-        
+        //Enter a word and the program will figure out if it is attainable or not
+        //I don't think it runs fully at the moment though
+        System.out.println(wordSolver.wordFindable("ROCKS"));
 
         System.out.println("Completed!");
         

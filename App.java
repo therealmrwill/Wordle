@@ -1,5 +1,7 @@
+import java.io.File;
 import java.io.PrintWriter;
 import java.net.CacheRequest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -9,19 +11,18 @@ import java.util.Scanner;
  * App
  */
 public class App {
-
+    private static final int WORD_LENGTH = 5;
     public static void main(String[] args) {
         String baseFileString = "FullWordList.txt";
         String invalidFile = "DebugFiles/InvalidWords.txt";
         String validFile = "DebugFiles/ValidWords.txt";
         String unsolvableFile = "DebugFiles/UnsolvableWords.txt";
        
-        WordSolver wordSolver = new WordSolver(unsolvableFile);
+        WordSolver wordSolver = new WordSolver(fileToArray(baseFileString));
 
         //TODO: If score array is updated re-run the data sorted
-        //I would recommend running it on the unsolvable list first, to see if it removes any
         //Current unsolvable word list size 1,431
-        wordSolver.runDataTest();
+        wordSolver.runDataTest(fileToArray(baseFileString));
 
         //Enter a word and the program will figure out if it is attainable or not
         //wordSolver.wordFindable("STING");
@@ -30,6 +31,35 @@ public class App {
         System.out.println("Completed!");
         
         
+    }
+
+    private static List<String> fileToArray(String baseFileString) {
+        List<String> wordsInArray = new ArrayList<>();
+        File fileToScan = new File(baseFileString);
+        Scanner fScanner = null;
+
+        try{
+            fScanner = new Scanner(fileToScan);
+
+            while(fScanner.hasNext()){
+                String currentWord = fScanner.next();
+                if(currentWord.length() == WORD_LENGTH){
+                    wordsInArray.add(currentWord);
+                }
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally{
+            if(fScanner != null){
+                fScanner.close();
+            }
+        }
+
+
+
+        return wordsInArray;
     }
 
     

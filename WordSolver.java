@@ -2,8 +2,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 public class WordSolver {
     //* Unchanged Params
@@ -17,6 +20,7 @@ public class WordSolver {
     //* Testing Params
     private List<String> baseWordMap;
     private int baseWordMapSize;
+    private double dataListSize;
     
 
     //* Output Params
@@ -41,10 +45,23 @@ public class WordSolver {
         this.undetectedWordList = new ArrayList<>();
         this.findableWordList = new ArrayList<>();
 
+    } 
+    public WordSolver(List<String> dataList){
+        // Creating a new instance of the WordChecker class
+        this.wordChecker = new WordChecker(dataList);
+
+        System.out.println("WordChecker constructed");
+
+        //Testing Params
+        this.baseWordMap = this.wordChecker.getCurrentValidWordMap();
+        this.baseWordMapSize = this.wordChecker.getValidMapSize();
+
+        //Output Params
+        this.findableWordMap = new HashMap<>();
+        this.undetectedWordList = new ArrayList<>();
+        this.findableWordList = new ArrayList<>();
+
     }
-
-    //TODO: Create a second constructor with an input of an ArrayList 
-
 
     //* Data Setters
     //TODO: Create Setters
@@ -55,8 +72,9 @@ public class WordSolver {
 
 
     //* Main Public Methods
-    public boolean runDataTest(){
-       for (String wordToFind : this.baseWordMap) {
+    public boolean runDataTest(List<String> dataToTest){
+       this.dataListSize = dataToTest.size(); 
+       for (String wordToFind : dataToTest) {
            boolean wordFound = wordFindable(wordToFind);
            if(wordFound){
                 this.findableWordList.add(wordToFind);
@@ -71,9 +89,8 @@ public class WordSolver {
            System.out.println("Word:" + wordToFind + " sorted");
         }
 
-       //For debug purposes only 
-       debugFilePrinter(this.undetectedWordList, "DebugFiles/UnsolvableWords.txt");
-       debugFilePrinter(this.findableWordList, "DebugFiles/FoundWords.txt");
+        dataTestResultsPrinter();       
+       
 
 
        if(this.findableWordMap.size() == this.baseWordMapSize){
@@ -83,6 +100,55 @@ public class WordSolver {
            return false;
        }
 
+    }
+
+    private void dataTestResultsPrinter() {
+        System.out.println("\nData Test Completed!");
+
+        System.out.println("\nResults:");
+
+        System.out.println("Number of Detectable words: " + this.findableWordList.size());
+        System.out.println("Number of Undetectable words: " + this.undetectedWordList.size());
+        System.out.printf("Percentage of words not detected: %.2f%% ", (float)(this.undetectedWordList.size() / this.dataListSize) * 100);
+        System.out.print("\n");
+
+        if(!this.findableWordList.isEmpty()){
+            System.out.println("\nDetectable Word Results:");
+            Map<Integer, Integer> wordsByRound = wordsByRoundDataGetter();        
+            Set<Map.Entry<Integer, Integer>> set = wordsByRound.entrySet();
+            Iterator<Map.Entry<Integer, Integer>> i = set.iterator();
+            while(i.hasNext()){
+                Entry<Integer, Integer> currentData = i.next();
+                System.out.print("Words found in round " + currentData.getKey() + ": " + currentData.getValue());
+                System.out.printf(" - %.2f %%", (float)(currentData.getValue() / (double)this.findableWordList.size()) * 100);
+                System.out.print("\n");
+            }
+        }
+        
+        debugFilePrinter(this.findableWordList, "DebugFiles/DetectableWords.txt");
+        debugFilePrinter(this.undetectedWordList, "DebugFiles/UndetectableWords.txt");
+        
+        System.out.println("\nFile with list of detectable words: DetectableWords.txt");
+        System.out.println("File with list of undetectable words: UndetectableWords.txt");
+
+    }
+
+    private Map<Integer, Integer> wordsByRoundDataGetter() {
+        Map<Integer, Integer> wordsByRound = new HashMap<>();
+        
+        for(int i = 0; i < NUM_OF_GUESSES; i++){
+            wordsByRound.put(i+1, 0);
+        }
+
+        Set<Map.Entry<String, Integer>> set = this.findableWordMap.entrySet();
+        Iterator<Map.Entry<String, Integer>> i = set.iterator();
+
+        while(i.hasNext()){
+            int currentWordRoundNum = i.next().getValue();
+            wordsByRound.put(currentWordRoundNum, (wordsByRound.get(currentWordRoundNum) + 1));
+        }
+
+        return wordsByRound;
     }
 
     public boolean wordFindable(String correctWord) {

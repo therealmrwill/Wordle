@@ -25,6 +25,9 @@ public class WordChecker {
     private HashMap<Character, Double> currentTotalLetterMap;
     private HashMap<Integer, HashMap<Character, Double>> basePositionalLetterMapWrapper;
     private HashMap<Integer, HashMap<Character, Double>> currentPositionalLetterMapWrapper;
+
+    //* New And possibly buggy params
+    private Map<Character, Double> wordsCharIsInMap;
     
     //* Output Parameters
     private ArrayList<String> orderedValidWordMap;
@@ -44,6 +47,7 @@ public class WordChecker {
         this.currentInvalidWordMap = new ArrayList<>();
         this.basePositionalLetterMapWrapper = new HashMap<>();
         this.currentPositionalLetterMapWrapper = new HashMap<>();
+        this.wordsCharIsInMap = charHashCleared();
 
         //* For loop is a continuation of the base values, some have to be filled using a loop
         for(int i = 0; i < WORD_LENGTH; i++){
@@ -80,6 +84,7 @@ public class WordChecker {
         this.currentInvalidWordMap = new ArrayList<>();
         this.basePositionalLetterMapWrapper = new HashMap<>();
         this.currentPositionalLetterMapWrapper = new HashMap<>();
+        this.wordsCharIsInMap = charHashCleared();
 
         //* For loop is a continuation of the base values, some have to be filled using a loop
         for(int i = 0; i < WORD_LENGTH; i++){
@@ -270,14 +275,13 @@ public class WordChecker {
 
     //* Main Data Prep Methods
     public void allDataUpdate(){
-        //Todo:
-        //Set updating to true
+        //? What this does
         //Update unordered maps
         //Update ordered maps using scoring data
         //Update letterMaps
             //Update currentTotalLetterMap
             //Update currentPositionalLetterMapWrapper
-        //Set updating to false
+
         unorderedMapUpdate();
         letterMapUpdate();
         orderedMapUpdate();
@@ -402,11 +406,15 @@ public class WordChecker {
     
 
     private void letterMapUpdate(){
-        currentTotalLetterMap = letterScoreFinder();
+        this.currentTotalLetterMap = letterScoreFinder();
         for(int i = 0; i < WORD_LENGTH; i++){
-            currentPositionalLetterMapWrapper.put(i, positionedLetterScoreFinder(i));
+            this.currentPositionalLetterMapWrapper.put(i, positionedLetterScoreFinder(i));
         }
+        
+        this.wordsCharIsInMap = updateWordsCharIsInMap();
     }
+
+    
 
     //* Word Checker Helper Methods
     private boolean inInvalidCharList(int posInWord, char currentChar) {
@@ -452,9 +460,9 @@ public class WordChecker {
         //Set score to 0
         //Make a loop for letters in the word
             //Add points based on currentLetterMap
-            //Add quarter points based on original letter map
+            //? Add quarter points based on original letter map
             //Add points based on positioning maps
-            //Add quarter points based on original positioning maps
+            //? Add quarter points based on original positioning maps
             //Add half currentLetterMap points if letter is in known letters
             //Add points for every word in currentValidWordMap that contains character
             //Subtract if character is already invalid for that location (Should only affect invalid words)
@@ -481,19 +489,14 @@ public class WordChecker {
                 score += this.currentTotalLetterMap.get(word.charAt(i)) / 2;
             }
 
-            // //! New line could be buggy
+            // New line could be buggy
             if(possibleChars.indexOf(word.charAt(i)) != -1){
                 score += this.currentTotalLetterMap.get(word.charAt(i)) / 2;
             }
             
-            
-            for(int k = 0; k < this.currentValidWordMap.size() && this.currentValidWordMap.size() < 100; k++){
-                String currentWordFromMap = this.currentValidWordMap.get(k);
-        
-                if(currentWordFromMap.charAt(i) == word.charAt(i)){
-                    score += this.currentTotalLetterMap.get(word.charAt(i)) / (currentValidWordMap.size() * currentWordFromMap.length());
-                }
-                }
+            //TODO: Change this
+            score += this.wordsCharIsInMap.get(word.charAt(i));
+
             
 
             //Subtraction based on if character is already invalid in position
@@ -735,6 +738,17 @@ public class WordChecker {
         return numCharHash;
     }
 
+    private Map<Character, Double> updateWordsCharIsInMap() {
+        Map<Character, Double> dataMap = charHashCleared();
+
+        for (String currentString : this.currentValidWordMap) {
+            for(int i = 0; i < currentString.length(); i++){
+                dataMap.put(currentString.charAt(i), dataMap.get(currentString.charAt(i)) + 1d);
+            }
+        }
+
+        return dataMap;
+    }
 
     //* Broken or invalid methods 
     //Should be empty :)

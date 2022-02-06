@@ -22,6 +22,7 @@ public class App {
         //Enter a word and the program will figure out if it is attainable or not
         wordSolver.wordFindable("Word here");
 
+        
         System.out.println("Completed!");
         
         

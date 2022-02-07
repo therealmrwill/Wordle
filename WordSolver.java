@@ -84,8 +84,6 @@ public class WordSolver {
                 this.undetectedWordList.add(wordToFind);
            }
 
-           
-
 
            //? Lines are just for debug purposes
            if((int)(i / this.dataListSize * 100) != currentPercent && currentPercent % 10 == 0 && currentPercent != 0){

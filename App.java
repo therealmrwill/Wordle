@@ -23,7 +23,7 @@ public class App {
         //TODO: If score array is updated re-run the data sorted
         //Current unsolvable word list size 1,431
         //wordSolver.runDataTest(fileToArray(unsolvableFile));
-        wordSolver.runDataTest(fileToArray(unsolvableFile));
+        wordSolver.runDataTest(fileToArray(baseFileString));
 
         //Enter a word and the program will figure out if it is attainable or not
 

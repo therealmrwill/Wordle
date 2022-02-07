@@ -476,8 +476,8 @@ public class WordChecker {
         for(int i = 0; i < word.length(); i++){
 
             //Points based on original maps
-            score += this.baseTotalLetterMap.get(word.charAt(i)) / (this.baseTotalLetterMap.size() / (double)this.currentTotalLetterMap.size());
-            score += this.basePositionalLetterMapWrapper.get(i).get(word.charAt(i)) / (this.baseTotalLetterMap.size() / (double)this.currentTotalLetterMap.size());
+            // score += this.baseTotalLetterMap.get(word.charAt(i)) / (this.baseTotalLetterMap.size() / (double)this.currentTotalLetterMap.size());
+            // score += this.basePositionalLetterMapWrapper.get(i).get(word.charAt(i)) / (this.baseTotalLetterMap.size() / (double)this.currentTotalLetterMap.size());
             
             //Points based on current maps
             score += this.currentTotalLetterMap.get(word.charAt(i));

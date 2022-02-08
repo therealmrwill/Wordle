@@ -26,13 +26,13 @@ public class App {
         //Current unsolvable word list size 1,431
         //wordSolver.runDataTest(fileToArray(unsolvableFile));
         //wordSolver.runDataTest(fileToArray(unsolvableFile));
-
+        //wordSolver.wordFindable("FRAME");
         //Enter a word and the program will figure out if it is attainable or not
 
         
 
 
-        //WordCheckerV2 wordChecker = new WordCheckerV2(fileToArray(baseFileString), WORD_LENGTH, NUM_OF_GUESSES);
+        WordCheckerV2 wordChecker = new WordCheckerV2(fileToArray(baseFileString), WORD_LENGTH, NUM_OF_GUESSES);
         
         System.out.println("Completed!");
         

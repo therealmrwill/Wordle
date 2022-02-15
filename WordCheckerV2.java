@@ -23,12 +23,16 @@ public class WordCheckerV2 {
     private int currentRound;
     private List<String> baseWords;
 
-    private Map<Character, Integer> baseRankedChars;
+    private Map<Character, Double> baseScoredChars;
+    private Map<Character, Double> currentScoredChars;
     private Map<Character, Integer> currentRankedChars;
 
-    private Map<Integer, Map<Character, Integer>> basePositionalRankedChars;
+    private Map<Integer, Map<Character, Double>> basePositionalScoredChars;
+    private Map<Integer, Map<Character, Double>> currentPositionalScoredChars;
     private Map<Integer, Map<Character, Integer>> currentPositionalRankedChars;
 
+    private Map<Character, Double> baseDiversityScoredChars;
+    private Map<Character, Double> currentDiversityScoredChars;
     private Map<Character, Integer> currentDiversityRankedChars;
 
     //* Output Parameters
@@ -69,12 +73,11 @@ public class WordCheckerV2 {
             this.currentTestableCharacters = new ArrayList<>(26); //Needs Filled
             this.currentInvalidChars = new ArrayList<>();
             this.currentPositionalInvalidChars = new HashMap<>(this.WORD_LENGTH); //Needs Filled
-            ArrayList<Character> blankArrayList = new ArrayList<>();
 
             //Filling of Parameters
             for(int i = 0; i < this.WORD_LENGTH; i++){
                 this.currentLockedChars[i] = '#';
-                this.currentPositionalInvalidChars.put(i, blankArrayList);
+                this.currentPositionalInvalidChars.put(i, new ArrayList<>());
             }
             
                 //Filling of currentTestableCharacters
@@ -92,43 +95,43 @@ public class WordCheckerV2 {
             //Creation of Parameters
             this.currentRound = 0;
             this.baseWords = new ArrayList<>();
-            this.baseRankedChars = new HashMap<>();
+
+            this.baseScoredChars = charMapFiller();
+            this.currentScoredChars = charMapFiller();
             this.currentRankedChars = new HashMap<>();
-            this.basePositionalRankedChars = new HashMap<>();
-            this.currentDiversityRankedChars = new HashMap<>();
+
+            this.basePositionalScoredChars = new HashMap<>();
+            for(int i = 0; i < this.WORD_LENGTH; i++){
+                this.basePositionalScoredChars.put(i, charMapFiller());
+            }
+            
+            this.currentPositionalScoredChars = new HashMap<>();
             this.currentPositionalRankedChars = new HashMap<>();
-            
 
-            //Temporary Parameter Prep
-            Map<Character, Double> charTotal = charMapFiller();
-            Map<Character, Double> diversity = charMapFiller();
-
-            Map<Character, Double> pos0CharTotal = charMapFiller();
-            Map<Character, Double> pos1CharTotal = charMapFiller();
-            Map<Character, Double> pos2CharTotal = charMapFiller();
-            Map<Character, Double> pos3CharTotal = charMapFiller();
-            Map<Character, Double> pos4CharTotal = charMapFiller();
+            this.baseDiversityScoredChars = charMapFiller();
+            this.currentDiversityScoredChars = charMapFiller();
+            this.currentDiversityRankedChars = new HashMap<>();
             
-            
-            
-            //Filling of baseWords and all Temp Parameters
+            //Filling of all score based parameters
             for (String string : testData) {
                 if(string.length() == this.WORD_LENGTH){
                     this.baseWords.add(string);
                     char[] charArray = string.toCharArray();
+
                     ArrayList<Character> previousChars = new ArrayList<>();
-                    pos0CharTotal.put(charArray[0], pos0CharTotal.get(charArray[0]) + 1);
-                    pos1CharTotal.put(charArray[1], pos1CharTotal.get(charArray[1]) + 1);
-                    pos2CharTotal.put(charArray[2], pos2CharTotal.get(charArray[2]) + 1);
-                    pos3CharTotal.put(charArray[3], pos3CharTotal.get(charArray[3]) + 1);
-                    pos4CharTotal.put(charArray[4], pos4CharTotal.get(charArray[4]) + 1);
 
                     for (int i = 0; i < charArray.length; i++){
                         char currentChar = charArray[i];
-                        charTotal.put(currentChar, charTotal.get(currentChar) + 1);
-                        
+
+                        //Adds character to based score char
+                        this.baseScoredChars.put(currentChar, this.baseScoredChars.get(currentChar) + 1);
+
+                        //Adds character to positional score char
+                        this.basePositionalScoredChars.get(i).put(currentChar, this.basePositionalScoredChars.get(i).get(currentChar) + 1);
+
+                        //If the letter has not already been seen in the word, at it to character diversity
                         if(!previousChars.contains(currentChar)){
-                            diversity.put(currentChar, diversity.get(currentChar) + 1);
+                            this.baseDiversityScoredChars.put(currentChar, this.baseDiversityScoredChars.get(currentChar) + 1);
                             previousChars.add(currentChar);
                         }
                         
@@ -137,18 +140,26 @@ public class WordCheckerV2 {
 
             }
 
-            //Filling of true Parameters
-            this.baseRankedChars = baseCharRank(charTotal);
-            this.currentRankedChars = this.baseRankedChars;
-            this.basePositionalRankedChars.put(0, baseCharRank(pos0CharTotal));
-            this.basePositionalRankedChars.put(1, baseCharRank(pos1CharTotal));
-            this.basePositionalRankedChars.put(2, baseCharRank(pos2CharTotal));
-            this.basePositionalRankedChars.put(3, baseCharRank(pos3CharTotal));
-            this.basePositionalRankedChars.put(4, baseCharRank(pos4CharTotal));
-            this.currentPositionalRankedChars = this.basePositionalRankedChars;
-            this.currentDiversityRankedChars = baseCharRank(diversity);
+            //?After the code above runs, all parameters that are fully prepped are
+            //baseWords 
+            //baseScoredChars
+            //basePositionalScoredChars
+            //Base diversityScoredChars
 
+            //Filling of current scored hashmaps
+            this.currentScoredChars = this.baseScoredChars;
+            this.currentPositionalScoredChars = this.basePositionalScoredChars;
+            this.currentDiversityScoredChars = this.baseDiversityScoredChars;
 
+            //Filling of current ranked hashmaps
+            this.currentRankedChars = baseCharRank(this.baseScoredChars);
+
+            for(int i = 0; i < this.WORD_LENGTH; i++){
+                this.currentPositionalRankedChars.put(i, baseCharRank(this.basePositionalScoredChars.get(i)));
+            }
+
+            this.currentDiversityRankedChars = baseCharRank(this.baseDiversityScoredChars);
+            
             //? Turn on to check functionality of Scoring Param Initializer
             //System.out.println("Debug Helper: WordChecker.initializeScoringParams() ran successfully");
         }
@@ -208,14 +219,14 @@ public class WordCheckerV2 {
         private void initializeOutputParams() {
             //Instantiation and filling of output parameters
             this.currentValidWords = this.baseWords;
-            this.currentInvalidWords = this.baseWords;
+            this.currentInvalidWords = new ArrayList<>();
             this.currentOrderedWords = listOrdering(this.baseWords);
         }
 
 
 
     //* Main Methods (In call order)
-    private List<String> listOrdering(List<String> listToOrder) {
+    public List<String> listOrdering(List<String> listToOrder) {
             TreeMap<Double, String> orderedScores = new TreeMap<>();
             List<Double> previousScores = new ArrayList<>();
             double currentScoreSubtraction = .000001d;
@@ -258,8 +269,6 @@ public class WordCheckerV2 {
 
                 //Score changes for every character in the word
                 for(int i = 0; i < currentString.length(); i++){
-                    //Clears previous data
-                    previousCharacters.clear();
 
                     //Adds this characters score to the main score 
                     wordScore += getCharScore(currentString.charAt(i), i, previousCharacters);
@@ -382,7 +391,79 @@ public class WordCheckerV2 {
                 return charScore;
             }
     
+    public void addInvalidString(String invalidString, String answerString){
 
+        //Adds word the the invalid word list
+        this.currentInvalidWords.add(invalidString);
+
+        //Removes word from valid word list
+        if(this.currentValidWords.contains(invalidString)){
+            this.currentValidWords.remove(invalidString);
+        }
+
+        //Check through every character and add data to validity params
+        for(int charIterator = 0; charIterator < invalidString.length(); charIterator++){
+            char currentChar = invalidString.charAt(charIterator);
+
+            //* Adding char to validity params
+            //Adding a character that is locked in the right position
+            if(currentChar == answerString.charAt(charIterator) && this.currentLockedChars[charIterator] == '#'){
+                this.currentLockedChars[charIterator] = currentChar;
+            } //If character is not "Green" checks if character exists in the word at another position !Could be buggy
+            else if(answerString.contains(invalidString.substring(charIterator, charIterator + 1))){
+                this.currentProvenChars.add(currentChar);
+
+                if(!this.currentPositionalInvalidChars.get(charIterator).contains(currentChar)){
+                    this.currentPositionalInvalidChars.get(charIterator).add(currentChar);
+                }
+
+            }// If character is not "Green" or "Yellow" treat it as an invalid character
+            else{
+                if(!this.currentPositionalInvalidChars.get(charIterator).contains(currentChar)){
+                    this.currentPositionalInvalidChars.get(charIterator).add(currentChar);
+                }
+                if(!this.currentInvalidChars.contains(currentChar)){
+                    this.currentInvalidChars.add(currentChar);
+                }
+
+            }   
+
+
+            if(currentTestableCharacters.contains(currentChar)){
+                this.currentTestableCharacters.remove(currentChar);
+            }
+            
+        }
+
+        //Removing word from scoring parameters
+        //!Does not update any of the ranked score variables
+        removeWordFromScoring(invalidString);
+
+        //Adds 1 to round num
+        this.currentRound++;
+
+        //Moving words to their proper list
+        //Either the valid or invalid list
+        
+    }
+
+    private void removeWordFromScoring(String wordRemoved) {
+        ArrayList<Character> previousCharacters = new ArrayList<>();
+
+        for(int i = 0; i < wordRemoved.length(); i++){
+            char currentChar = wordRemoved.charAt(i);
+
+            this.currentScoredChars.put(currentChar, this.currentScoredChars.get(currentChar) - 1);
+
+            this.currentPositionalScoredChars.get(i).put(currentChar, this.currentPositionalScoredChars.get(i).get(currentChar) - 1);
+
+            if(!previousCharacters.contains(currentChar)){
+                this.currentDiversityScoredChars.put(currentChar, this.currentDiversityScoredChars.get(currentChar) - 1);
+            }
+        }
+    }
+
+    
     
     
 

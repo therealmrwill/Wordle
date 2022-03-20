@@ -5,9 +5,15 @@ public class Letter implements Comparable<Letter>{
 
    
 
-    public Letter(Character letter, Double score) {
+    public Letter(Character letter, Double score, int Rank) {
         this.letter = letter;
         this.score = score;
+    }
+
+    
+
+    public Letter(Character letter) {
+        this.letter = letter;
     }
 
     public Character getLetter() {
@@ -24,6 +30,10 @@ public class Letter implements Comparable<Letter>{
 
     public void setScore(Double score) {
         this.score = score;
+    }
+
+    public void UpdateScore(Double amount){
+        this.score += amount;
     }
    
     @Override

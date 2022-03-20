@@ -2,7 +2,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.net.CacheRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -11,47 +11,18 @@ import java.util.Scanner;
  * App
  */
 public class App {
-    private static final int WORD_LENGTH = 5;
+    public static final int WORD_LENGTH = 5;
+    public static final int NUM_OF_ROUNDS = 6;
+    public static final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     
     public static void main(String[] args) {
-        String baseFileString = "FullWordList.txt";
-        String invalidFile = "DebugFiles/InvalidWords.txt";
-        String validFile = "DebugFiles/ValidWords.txt";
-        String unsolvableFile = "DebugFiles/OriginUndetectableWords.txt";
-       
-       
+        Scoring.init();
+        System.out.println(Scoring.getCurrentInfo());
         
         
     }
 
-    private static List<String> fileToArray(String baseFileString) {
-        List<String> wordsInArray = new ArrayList<>();
-        File fileToScan = new File(baseFileString);
-        Scanner fScanner = null;
 
-        try{
-            fScanner = new Scanner(fileToScan);
-
-            while(fScanner.hasNext()){
-                String currentWord = fScanner.next();
-                if(currentWord.length() == WORD_LENGTH){
-                    wordsInArray.add(currentWord);
-                }
-            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally{
-            if(fScanner != null){
-                fScanner.close();
-            }
-        }
-
-
-
-        return wordsInArray;
-    }
 
     
 

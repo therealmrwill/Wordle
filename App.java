@@ -12,7 +12,6 @@ import java.util.Scanner;
  */
 public class App {
     private static final int WORD_LENGTH = 5;
-    private static final int NUM_OF_GUESSES = 6;
     
     public static void main(String[] args) {
         String baseFileString = "FullWordList.txt";
@@ -20,21 +19,7 @@ public class App {
         String validFile = "DebugFiles/ValidWords.txt";
         String unsolvableFile = "DebugFiles/OriginUndetectableWords.txt";
        
-        //WordSolver wordSolver = new WordSolver(fileToArray(baseFileString));
-
-        //TODO: If score array is updated re-run the data sorted
-        //Current unsolvable word list size 1,431
-        //wordSolver.runDataTest(fileToArray(unsolvableFile));
-        //wordSolver.runDataTest(fileToArray(unsolvableFile));
-        //wordSolver.wordFindable("FRAME");
-        //Enter a word and the program will figure out if it is attainable or not
-
-        
-
-
-        WordCheckerV2 wordChecker = new WordCheckerV2(fileToArray(baseFileString), WORD_LENGTH, NUM_OF_GUESSES);
-        
-        System.out.println("Completed!");
+       
         
         
     }

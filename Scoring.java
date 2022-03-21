@@ -91,14 +91,23 @@ public class Scoring {
     public double scoreWord(String word){
         //* Definitely will need a hard re-build, just not tonight
         double score = 0;
+        ArrayList<Character> previouCharacters = new ArrayList<>();
 
         for(int position = 0; position < word.length(); position++){
+            int charScore = 0;
             char curChar = word.charAt(position);
             int index = getIndex(curChar);
 
-            score += rankedMap.get(index).getScore();
-            score += rankedDivMap.get(index).getScore();
-            score += rankedPosMap.get(position).get(index).getScore();
+            charScore += rankedMap.get(index).getScore();
+            charScore += rankedDivMap.get(index).getScore();
+            charScore += rankedPosMap.get(position).get(index).getScore();
+
+            if(previouCharacters.contains(curChar)){
+                charScore /= 2;
+            }
+
+            score += charScore;
+            previouCharacters.add(curChar);
 
         }
 

@@ -8,6 +8,7 @@ public class AutoSolver {
 
    private ArrayList<Word> guessedWords;
    private Word foundSolution;
+   public boolean solved = false;
 
    
    public AutoSolver(Scoring scoreData, Validity validityData, ArrayList<Word> wordList) {
@@ -40,6 +41,9 @@ public class AutoSolver {
          if(wordList.get(0).getWord().equals(solution)){
             foundSolution = wordList.get(0);
             validityData.addTestedWord(solution, validityData.getValidityData(solution, solution));
+
+            //* Line is for debug 
+            solved = true;
             return true;
          }else{
             guessedWords.add(wordList.get(0));
@@ -90,7 +94,7 @@ public class AutoSolver {
          dataOut += solution + ": ";
 
          for (Word word : guessedWords){
-            dataOut += word.getWord() + word.getScore() + ", ";
+            dataOut += word.getWord() + " " + word.getScore() + ", ";
          }     
          
          dataOut += this.foundSolution.getWord();

@@ -104,7 +104,7 @@ public class Validity {
             if(currChar == solution.charAt(position)){
                 dataOut += "G";
             }
-            else if(solution.contains(charString) && !previousCharacters.contains(currChar)){
+            else if(solution.contains(charString) ){
                 dataOut += "Y";
                 previousCharacters.add(currChar);
             }

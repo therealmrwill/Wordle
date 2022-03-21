@@ -14,18 +14,17 @@ public class Word implements Comparable<Word>{
 
     public Word(String word, boolean valid){
         this.name = word;
-        this.score = -1.0;
+        this.score = 0.0;
         this.valid = valid;
     }
 
     public Word(String word){
         this.name = word;
-        this.score = -1.0;
+        this.score = 0.0;
         this.valid = true;
 
     }
 
-    
     public String getWord(){
         return this.name;
     }
@@ -34,22 +33,15 @@ public class Word implements Comparable<Word>{
         return score;
     }
 
-    public void UpdateScore(Double score) {
-        //Change this so that it runs the scoreWordMethod
-        //Shouldn't need to have anything passed in
+    public void setScore(Double score) {
         this.score = score;
     }
 
     public boolean isValid() {
-        //Change this so that it automatically updates validity before sending back a result
-        //Could slow it down, but I think the extra checking is much better than not
-
         return valid;
     }
 
     public void UpdateValidity(boolean valid) {
-        //Change this so that is runs the IsValid 
-        //Shouldn't need anything to be passed in
         this.valid = valid;
     }
 

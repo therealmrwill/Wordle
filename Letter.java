@@ -6,8 +6,7 @@ public class Letter implements Comparable<Letter>{
         this.letter = letter;
         this.score = score;
     }
-
-    
+        
 
     public Letter(Character letter) {
         this.letter = letter;

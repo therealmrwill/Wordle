@@ -1,11 +1,10 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class Scoring {
     private int round;
+    private int roundsLeft;
     private Validity validityData;
     private ArrayList<Character> letterOrdering;
 
@@ -15,7 +14,9 @@ public class Scoring {
     
     public Scoring(ArrayList<Word> data){
         this.round = 0;
+        this.roundsLeft = App.NUM_OF_ROUNDS - round;
         this.validityData = new Validity();
+        this.letterOrdering = new ArrayList<>();
 
         for(Character newChar : App.alphabet.toCharArray()){
             letterOrdering.add(newChar);
@@ -30,6 +31,12 @@ public class Scoring {
         }
 
         addWordList(data);
+
+
+    }
+
+    public String getValidity(){
+        return validityData.toString();
     }
 
     public void addWordList(ArrayList<Word> data) {
@@ -46,12 +53,12 @@ public class Scoring {
             for(int position = 0; position < word.getWord().length(); position++){
                 Character currChar = word.getWord().charAt(position);
 
-                rankedMap.get(letterOrdering.indexOf(currChar)).UpdateScore(changeAmount);
+                rankedMap.get(getIndex(currChar)).UpdateScore(changeAmount);
 
-                rankedPosMap.get(position).get(letterOrdering.indexOf(currChar)).UpdateScore(changeAmount);
+                rankedPosMap.get(position).get(getIndex(currChar)).UpdateScore(changeAmount);
 
                 if(!previousCharacters.contains(currChar)){
-                    rankedDivMap.get(letterOrdering.indexOf(currChar)).UpdateScore(changeAmount);
+                    rankedDivMap.get(getIndex(currChar)).UpdateScore(changeAmount);
                 }
 
                 previousCharacters.add(currChar);
@@ -72,17 +79,39 @@ public class Scoring {
         return dataOut;
     }
 
+    private int getIndex(Character letter){
+        return letterOrdering.indexOf(letter);
+    }
+
     //* Needed Methods
     public void removeWord(Word word){
         changeScores(word, -1.0);
     }
 
     public double scoreWord(String word){
-        return -1.0;
+        //* Definitely will need a hard re-build, just not tonight
+        double score = 0;
+
+        for(int position = 0; position < word.length(); position++){
+            char curChar = word.charAt(position);
+            int index = getIndex(curChar);
+
+            score += rankedMap.get(index).getScore();
+            score += rankedDivMap.get(index).getScore();
+            score += rankedPosMap.get(position).get(index).getScore();
+
+        }
+
+        if(validityData.isValid(word) == false){
+            score = 0;
+        }
+
+        return score;
     }
 
     public void setRound(int newRound){
         this.round = newRound;
+        this.roundsLeft = App.NUM_OF_ROUNDS - round;
     }
 
     public void setValidity(Validity newValidityData){
@@ -93,6 +122,59 @@ public class Scoring {
     public String toString(){
         String dataOut = "";
 
+        dataOut += "\nScoring Data: ";
+        
+        dataOut += "\nRound #" + this.round + ": rounds left: " + this.roundsLeft;
+
+
+        //* All of this is to order the Letter data
+        ArrayList<Letter> orderedList = new ArrayList<>();
+        ArrayList<Letter> orderedDivList = new ArrayList<>();
+        ArrayList<ArrayList<Letter>> orderedPosList = new ArrayList<>();
+
+        for(int position = 0; position < App.WORD_LENGTH; position++){
+            orderedPosList.add(new ArrayList<>());
+        }
+
+        for (Character currChar : letterOrdering) {
+            int index = letterOrdering.indexOf(currChar);
+
+            orderedList.add(rankedMap.get(index));
+            orderedDivList.add(rankedDivMap.get(index));
+
+            for(int position = 0; position < App.WORD_LENGTH; position++){
+                orderedPosList.get(position).add(rankedPosMap.get(position).get(index));
+            }
+        }
+
+        //Sorts all of the new Data
+        Collections.sort(orderedList);
+        Collections.sort(orderedDivList);
+        for(int position = 0; position < App.WORD_LENGTH; position++){
+            Collections.sort(orderedPosList.get(position));
+        }        
+
+        dataOut += "\nOrdered Letter List: ";
+        dataOut += orderedList.get(0);
+        // for(Letter letter : orderedList){
+        //     dataOut += letter + " ";
+        // }
+
+        dataOut += "\nOrdered Diversity List: ";
+        dataOut += orderedDivList.get(0);
+        // for(Letter letter : orderedDivList){
+        //     dataOut += letter + " ";
+        // }
+
+        dataOut += "\nOrdered Positional List: ";
+        for(int position = 0; position < App.WORD_LENGTH; position++){
+            dataOut += "\nPosition " + (position + 1) + " data: ";
+            dataOut += orderedPosList.get(position).get(0);
+
+            // for(Letter letter : orderedPosList.get(position)){
+            //     dataOut += letter + " ";
+            // }
+        } 
 
         return dataOut;
     }

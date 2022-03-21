@@ -5,19 +5,17 @@ public class AutoSolver {
    private Scoring scoreData;
    private Validity validityData;
    private ArrayList<Word> wordList;
-   private boolean checkingInvalids;
 
    private ArrayList<Word> guessedWords;
    private Word foundSolution;
 
    
-   public AutoSolver(Scoring scoreData, Validity validityData, ArrayList<Word> wordList, boolean checkingInvalids) {
+   public AutoSolver(Scoring scoreData, Validity validityData, ArrayList<Word> wordList) {
       this.scoreData = scoreData;
       this.validityData = validityData;
       this.wordList = wordList;
-      this.checkingInvalids = checkingInvalids;
       guessedWords = new ArrayList<>();
-      foundSolution = new Word("No Solution Found");
+      foundSolution = new Word("NOPE.");
    }
 
    public boolean Run(String solution){
@@ -32,7 +30,7 @@ public class AutoSolver {
                scoreData.removeWord(currentWord);
             }
 
-            currentWord.UpdateScore(scoreData.scoreWord(currentWord.getWord()));
+            currentWord.setScore(scoreData.scoreWord(currentWord.getWord()));
          }
    
          Collections.sort(wordList);
@@ -45,7 +43,8 @@ public class AutoSolver {
             return true;
          }else{
             guessedWords.add(wordList.get(0));
-            validityData.addTestedWord(wordList.get(0).getWord(), validityData.getValidityData(wordList.get(0).getWord(), solution));
+            String validityString = validityData.getValidityData(wordList.get(0).getWord(), solution);
+            validityData.addTestedWord(wordList.get(0).getWord(), validityString);
          }
 
 
@@ -54,14 +53,17 @@ public class AutoSolver {
       return false;
    }
 
-   private void clearExcess() {
-      for(int position = wordList.size() - 1; position <= 0; position--){
+   private boolean clearExcess() {
+      for(int position = wordList.size() - 1; position >= 0; position--){
          if(wordList.get(position).isValid()){
-            return;
-         }else{
+            return true;
+         }
+         else{
             wordList.remove(position);
          }
       }
+
+      return false;
    }
 
    public String RunWithData(String solution, int dataLevel){
@@ -88,7 +90,7 @@ public class AutoSolver {
          dataOut += solution + ": ";
 
          for (Word word : guessedWords){
-            dataOut += word.getWord() + "-" + word.getScore() + ", ";
+            dataOut += word.getWord() + word.getScore() + ", ";
          }     
          
          dataOut += this.foundSolution.getWord();

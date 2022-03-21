@@ -23,11 +23,12 @@ public class DataReader {
 
             }
 
-
+            fscnr.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        
         return dataOut;
    } 
 }

@@ -2,10 +2,7 @@ public class Letter implements Comparable<Letter>{
    private Character letter;
    private Double score;
 
-
-   
-
-    public Letter(Character letter, Double score, int Rank) {
+    public Letter(Character letter, Double score) {
         this.letter = letter;
         this.score = score;
     }
@@ -14,14 +11,11 @@ public class Letter implements Comparable<Letter>{
 
     public Letter(Character letter) {
         this.letter = letter;
+        this.score = 0.0;
     }
 
     public Character getLetter() {
         return letter;
-    }
-
-    public void setLetter(Character letter) {
-        this.letter = letter;
     }
 
     public Double getScore() {

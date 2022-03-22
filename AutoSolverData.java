@@ -45,14 +45,14 @@ public class AutoSolverData {
             fullData += this.solved + ": ";
 
             for(Word word : guessedWords) {
-                fullData += ValidityData.getColoredValidity(word.getWord(), solutionString) + " ";
+                fullData += Validity.getColoredValidity(word.getWord(), solutionString) + " ";
             }
         }
         else if(debugLevel == 5){
             fullData += this.solved + ": ";
 
             for(Word word : guessedWords){
-                fullData += "( " +  word.getWord() + ": "  + ValidityData.getValidityData(word.getWord(), solutionString) + " ) ";
+                fullData += "( " +  word.getWord() + ": "  + Validity.getValidityData(word.getWord(), solutionString) + " ) ";
             }
         }
         else if(debugLevel == 6){

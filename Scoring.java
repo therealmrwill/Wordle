@@ -34,8 +34,6 @@ public class Scoring {
         }
 
         addWordList(data);
-
-
     }
 
     public Scoring(Scoring scoringData){

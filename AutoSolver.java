@@ -90,7 +90,7 @@ public class AutoSolver {
                this.foundSolution = currentGuess;
             }
             else{
-               String validityInfo = ValidityData.getValidityData(currentGuess.getWord(), solutionString);
+               String validityInfo = Validity.getValidityData(currentGuess.getWord(), solutionString);
                validityData.addTestedWord(currentGuess.getWord(), validityInfo);
             }
 

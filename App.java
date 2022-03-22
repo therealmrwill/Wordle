@@ -1,4 +1,4 @@
-
+import java.util.HashMap;
 
 /**
  * App
@@ -18,12 +18,17 @@ public class App {
     
 
     public static void main(String[] args) {
-        Word word1 = new Word("FRIES");
-        Word word2 = word1.getCopy();
-        Word word3 = word2.getCopy();
+        ValidityData vData = new ValidityData();
+        vData.addTestedWord("TARES", "BYGGY");
 
-        word1 = null;
-        
+        //* Cases for quick reference: Locked Only, Invalid Only, Valid Only, Valid and Invalid, All, All Colored
+        System.out.println(vData.saveInfo("Locked Only"));
+        System.out.println(vData.saveInfo("Invalid Only"));
+        System.out.println(vData.saveInfo("Valid Only"));
+        System.out.println(vData.saveInfo("Valid and Invalid"));
+        System.out.println(vData.saveInfo("All"));
+        System.out.println(vData.saveInfo("All Colored"));
+
     }
 
 

@@ -3,16 +3,19 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class Scoring {
+    private int uniqueId;
     private int round;
     private int roundsLeft;
     private Validity validityData;
     private ArrayList<Character> letterOrdering;
+    
 
     private HashMap<Integer, Letter> rankedMap;
     private HashMap<Integer, Letter> rankedDivMap;
     private ArrayList<HashMap<Integer, Letter>> rankedPosMap;
     
     public Scoring(ArrayList<Word> data){
+        this.uniqueId = 0;
         this.round = 0;
         this.roundsLeft = App.NUM_OF_ROUNDS - round;
         this.validityData = new Validity();
@@ -33,6 +36,17 @@ public class Scoring {
         addWordList(data);
 
 
+    }
+
+    public Scoring(Scoring scoringData){
+        this.uniqueId = scoringData.uniqueId + 1;
+        this.round = scoringData.round;
+        this.roundsLeft = scoringData.roundsLeft;
+        this.validityData = new Validity(scoringData.validityData);
+        this.letterOrdering = scoringData.letterOrdering;
+        this.rankedMap = scoringData.rankedMap;
+        this.rankedDivMap = scoringData.rankedDivMap;
+        this.rankedPosMap = scoringData.rankedPosMap;
     }
 
     public String getValidity(){
@@ -124,7 +138,11 @@ public class Scoring {
     }
 
     public void setValidity(Validity newValidityData){
-        this.validityData = newValidityData;
+        this.validityData = new Validity(newValidityData);
+    }
+
+    public int getRound(){
+        return this.round;
     }
 
     @Override

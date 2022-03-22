@@ -1,16 +1,25 @@
 public class Letter implements Comparable<Letter>{
+   private int uniqueID;
    private Character letter;
    private Double score;
 
     public Letter(Character letter, Double score) {
+        this.uniqueID = 0;
         this.letter = letter;
         this.score = score;
     }
         
 
     public Letter(Character letter) {
+        this.uniqueID = 0;
         this.letter = letter;
         this.score = 0.0;
+    }
+
+    public Letter(Letter letter){
+        this.uniqueID = letter.uniqueID + 1;
+        this.letter = letter.letter;
+        this.score = letter.score;
     }
 
     public Character getLetter() {

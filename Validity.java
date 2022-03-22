@@ -1,19 +1,28 @@
 import java.util.ArrayList;
 
 public class Validity {
+   private int uniqueId;
    private char[] lockedChars;
    private ArrayList<Character> knownChars;
    private ArrayList<ArrayList<Character>> posInvalidChars;
 
    public Validity(){
-        lockedChars = new char[5];
-        knownChars = new ArrayList<>();
-        posInvalidChars = new ArrayList<>();
+        this.uniqueId = 0;
+        this.lockedChars = new char[5];
+        this.knownChars = new ArrayList<>();
+        this.posInvalidChars = new ArrayList<>();
 
         for(int position = 0; position < App.WORD_LENGTH; position++){
-            lockedChars[position] = '$';
-            posInvalidChars.add(new ArrayList<>());
+            this.lockedChars[position] = '$';
+            this.posInvalidChars.add(new ArrayList<>());
         }
+   }
+
+   public Validity(Validity validityData){
+       this.uniqueId = validityData.uniqueId + 1;
+       this.lockedChars = validityData.lockedChars;
+       this.knownChars = validityData.knownChars;
+       this.posInvalidChars = validityData.posInvalidChars;
    }
 
    public boolean isValid(String word){
@@ -87,63 +96,10 @@ public class Validity {
 
    }
 
-   public String getValidityData(String word, String solution){
-        if(word.length() != solution.length()){
-            System.out.println("Error in Validity.getValidityData(" + word + ", " + solution + "): Word sizes do not match");
-            return "RRRRR";
-        }
 
-        String dataOut = "";
-        ArrayList<Character> previousCharacters = new ArrayList<>();
-
-        for(int position = 0; position < word.length(); position++){
-
-            String charString = word.substring(position, position + 1);
-            char currChar = word.charAt(position);
-
-            if(currChar == solution.charAt(position)){
-                dataOut += "G";
-            }
-            else if(solution.contains(charString) ){
-                dataOut += "Y";
-                previousCharacters.add(currChar);
-            }
-            else{
-                dataOut += "B";
-            }
-
-            
-        }
-
-
-        return dataOut;
+   public char[] getLockedChars() {
+       return lockedChars;
    }
-
-
-   public String getColoredValidity(String word){
-        String dataOut = "";
-
-        String currentSolution = "";
-        for(int position = 0; position < App.WORD_LENGTH; position++){
-            currentSolution += lockedChars[position];
-        }
-
-        String validityData = getValidityData(word, currentSolution);
-
-        for(int position = 0; position < validityData.length(); position++){
-            switch(validityData.charAt(position)){
-                case 'G': dataOut += App.ANSI_GREEN + word.charAt(position) + App.ANSI_RESET; break;
-                case 'Y': dataOut += App.ANSI_YELLOW + word.charAt(position) + App.ANSI_RESET; break;
-                case 'R': dataOut += App.ANSI_RED + word.charAt(position) + App.ANSI_RESET; break; 
-                case 'B': dataOut += word.charAt(position); break;
-                default: dataOut += App.ANSI_RED + word.charAt(position) + App.ANSI_RESET; break;  
-            }
-        }
-
-
-       return dataOut;
-   }
-
 
    @Override
    public String toString(){

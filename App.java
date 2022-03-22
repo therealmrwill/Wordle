@@ -1,7 +1,4 @@
-import java.io.File;
-import java.io.PrintWriter;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
+
 
 /**
  * App
@@ -21,42 +18,12 @@ public class App {
     
 
     public static void main(String[] args) {
-        int correct = 0;
-        int incorrect = 0;
-        ArrayList<Word> dataList = DataReader.readFromFile("FullWordList.txt");
+        Word word1 = new Word("FRIES");
+        Word word2 = word1.getCopy();
+        Word word3 = word2.getCopy();
+
+        word1 = null;
         
-                
-
-        try {
-            PrintWriter pw = new PrintWriter(new File("DebugFiles/SolveAll.txt"));           
-            ArrayList<Word> wordList = DataReader.readFromFile("FullWordList.txt");
-
-
-            for(Word word : wordList){
-                Scoring scoreData = new Scoring(dataList);
-                Validity validityData = new Validity();
-                AutoSolver currentSolver = new AutoSolver(scoreData, validityData, DataReader.readFromFile("FullWordList.txt"));
-                String data = currentSolver.RunWithData(word.getWord(), DEBUG_LEVEL);
-                if(currentSolver.solved){
-                    correct += 1;
-                }else{
-                    incorrect += 1;
-                }
-                pw.println(data);
-                System.out.println(data);
-
-            }
-            
-            pw.close();
-
-        } catch (Exception e){ 
-            e.printStackTrace();
-        }
-
-        
-        System.out.println("Correct: " + correct);
-        System.out.println("Incorrect " + incorrect);
-
     }
 
 

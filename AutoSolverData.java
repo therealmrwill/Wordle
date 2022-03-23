@@ -7,7 +7,7 @@ public class AutoSolverData {
     private Word solution;
     private int roundsToSolve;
     private ArrayList<Word> guessedWords;
-    private ArrayList<Validity> wordValidities;
+    private ArrayList<ValidityTests> wordValidities;
     private ArrayList<Integer> wordsLeftList;
 
     public AutoSolverData(AutoSolver endingData, int debugLevel){
@@ -45,14 +45,14 @@ public class AutoSolverData {
             fullData += this.solved + ": ";
 
             for(Word word : guessedWords) {
-                fullData += Validity.getColoredValidity(word.getWord(), solutionString) + " ";
+                fullData += ValidityTests.getColoredValidity(word.getWord(), solutionString) + " ";
             }
         }
         else if(debugLevel == 5){
             fullData += this.solved + ": ";
 
             for(Word word : guessedWords){
-                fullData += "( " +  word.getWord() + ": "  + Validity.getValidityData(word.getWord(), solutionString) + " ) ";
+                fullData += "( " +  word.getWord() + ": "  + ValidityTests.getValidityData(word.getWord(), solutionString) + " ) ";
             }
         }
         else if(debugLevel == 6){

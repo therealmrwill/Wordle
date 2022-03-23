@@ -6,7 +6,7 @@ public class Scoring {
     private int uniqueId;
     private int round;
     private int roundsLeft;
-    private Validity validityData;
+    private ValidityTests validityData;
     private ArrayList<Character> letterOrdering;
     
 
@@ -18,7 +18,7 @@ public class Scoring {
         this.uniqueId = 0;
         this.round = 0;
         this.roundsLeft = App.NUM_OF_ROUNDS - round;
-        this.validityData = new Validity();
+        this.validityData = new ValidityTests();
         this.letterOrdering = new ArrayList<>();
 
         for(Character newChar : App.alphabet.toCharArray()){
@@ -40,7 +40,7 @@ public class Scoring {
         this.uniqueId = scoringData.uniqueId + 1;
         this.round = scoringData.round;
         this.roundsLeft = scoringData.roundsLeft;
-        this.validityData = new Validity(scoringData.validityData);
+        this.validityData = new ValidityTests(scoringData.validityData);
         this.letterOrdering = scoringData.letterOrdering;
         this.rankedMap = scoringData.rankedMap;
         this.rankedDivMap = scoringData.rankedDivMap;
@@ -135,8 +135,8 @@ public class Scoring {
         this.roundsLeft = App.NUM_OF_ROUNDS - round;
     }
 
-    public void setValidity(Validity newValidityData){
-        this.validityData = new Validity(newValidityData);
+    public void setValidity(ValidityTests newValidityData){
+        this.validityData = new ValidityTests(newValidityData);
     }
 
     public int getRound(){

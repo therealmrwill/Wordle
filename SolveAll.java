@@ -4,7 +4,7 @@ public class SolveAll {
     private ArrayList<Word> guessableWordList;
     private ArrayList<Word> testingWordList;
     private Scoring baseScoringData;
-    private Validity baseValidityData;
+    private ValidityTests baseValidityData;
 
     private ArrayList<String> solvedWordData;
     private ArrayList<String> unSolvedWordData;
@@ -13,7 +13,7 @@ public class SolveAll {
         this.guessableWordList = guessableWordList;
         this.testingWordList = testingWordList;
         this.baseScoringData = new Scoring(guessableWordList);
-        this.baseValidityData = new Validity();
+        this.baseValidityData = new ValidityTests();
 
         this.solvedWordData = new ArrayList<>();
         this.unSolvedWordData = new ArrayList<>();
@@ -26,7 +26,7 @@ public class SolveAll {
         for(Word word : testList){
 
             Scoring scoringData = new Scoring(baseScoringData);
-            Validity validityData = new Validity(baseValidityData);
+            ValidityTests validityData = new ValidityTests(baseValidityData);
             ArrayList<Word> currGuessList = new ArrayList<>(guessableWordList);
             AutoSolver currentSolver = new AutoSolver(scoringData, validityData, currGuessList);
             String currentData = currentSolver.RunWithData(word.getWord(), App.DEBUG_LEVEL);

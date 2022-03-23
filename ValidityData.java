@@ -106,7 +106,7 @@ public class ValidityData {
                 } 
                 break; 
             case "All Colored":
-                dataOut += "All Data ";
+                dataOut += "Colored Data ";
                 for(Integer position : posCharData.keySet()){
                     dataOut += "\n(Pos: " + position + ":";
                     for(Character curChar : posCharData.get(position).keySet()){
@@ -127,8 +127,6 @@ public class ValidityData {
 
         return dataOut;
     }
-
-    
 
     //* Prints out the saveInfo of the current data
     @Override
@@ -175,7 +173,6 @@ public class ValidityData {
 
         return true;
     }
-
 
     //* Protects Object from any future changes
     //* Allows us to check if the object we are trying to change is final or not
@@ -261,15 +258,16 @@ public class ValidityData {
 
     //* Adds a 'Black' Character to data
     private void addBlackChar(Character letter, int position){
+        addInvalidChar(letter, position);
 
         for(int testPos = 0; testPos < App.WORD_LENGTH; testPos++){
             //* Adding rules to help with 'Fake blacks' - or blacks or a letter that is already known
+            //* If position in lockedChars doesn't equal our value
+            //* And knownChars doesn't contain our letter
             if(lockedChars[testPos] != letter && !knownChars.contains(letter)){
-                addInvalidChar(letter, position);
+                addInvalidChar(letter, testPos);
             }
-        }
-
-        addInvalidChar(letter, position);
+        } 
     }
 
     //* Adds an Invalid Character to posInvalidChars
@@ -297,7 +295,5 @@ public class ValidityData {
         return dataOut;
     }
     
-    
-
   
 }

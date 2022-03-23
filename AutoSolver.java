@@ -6,7 +6,7 @@ import java.util.Collections;
 public class AutoSolver {
    private int uniqueID;
    private Scoring scoreData;
-   private Validity validityData;
+   private ValidityTests validityData;
    private ArrayList<Word> wordList;
 
    //Data Variables
@@ -15,17 +15,17 @@ public class AutoSolver {
 
    private ArrayList<Word> guessedWords;
    private ArrayList<Integer> wordsLeft;
-   private ArrayList<Validity> wordValidities;
+   private ArrayList<ValidityTests> wordValidities;
    private ArrayList<Word> validWordList;
 
    private Word foundSolution;
    private boolean solved;
 
    
-   public AutoSolver(Scoring initScoreData, Validity initValidityData, ArrayList<Word> initWordList, Word testWord) {
+   public AutoSolver(Scoring initScoreData, ValidityTests initValidityData, ArrayList<Word> initWordList, Word testWord) {
       this.uniqueID = 0;
       this.scoreData = new Scoring(initScoreData);
-      this.validityData = new Validity(initValidityData);
+      this.validityData = new ValidityTests(initValidityData);
       this.wordList = new ArrayList<>(initWordList);
 
       //* Input Parameters should not be changed beyond this point
@@ -42,7 +42,7 @@ public class AutoSolver {
       for(int round = 1; round <= App.NUM_OF_ROUNDS && this.solved == false; round++){
          //Making sure scoring data is all accurate
          this.scoreData.setRound(round);
-         this.scoreData.setValidity(new Validity(this.validityData));
+         this.scoreData.setValidity(new ValidityTests(this.validityData));
 
          for(Word curWord : this.wordList){
             String curWordString = curWord.getWord();
@@ -83,14 +83,14 @@ public class AutoSolver {
             this.guessedWords.add(currentGuess);
             this.wordsLeft.add(this.validWordList.size());
             this.wordListLeft.add(this.validWordList);
-            this.wordValidities.add(new Validity(this.validityData));
+            this.wordValidities.add(new ValidityTests(this.validityData));
 
             if(currentGuess.getWord().equals(solutionString)){
                this.solved = true;
                this.foundSolution = currentGuess;
             }
             else{
-               String validityInfo = Validity.getValidityData(currentGuess.getWord(), solutionString);
+               String validityInfo = ValidityTests.getValidityData(currentGuess.getWord(), solutionString);
                validityData.addTestedWord(currentGuess.getWord(), validityInfo);
             }
 
@@ -107,7 +107,7 @@ public class AutoSolver {
    public AutoSolver(AutoSolver autoSolverData){
       this.uniqueID = autoSolverData.uniqueID + 1;
       this.scoreData = new Scoring(autoSolverData.scoreData);
-      this.validityData = new Validity(autoSolverData.validityData);
+      this.validityData = new ValidityTests(autoSolverData.validityData);
       this.wordList = new ArrayList<>(autoSolverData.wordList);
       this.guessedWords = new ArrayList<>(autoSolverData.guessedWords);
       this.foundSolution = autoSolverData.foundSolution;
@@ -169,11 +169,11 @@ public class AutoSolver {
       return wordListLeft;
    }
 
-   public ArrayList<Validity> getWordValidities(){
+   public ArrayList<ValidityTests> getWordValidities(){
       return this.wordValidities;
    }
 
-   public Validity getValidity(){
+   public ValidityTests getValidity(){
       return this.validityData;
    } 
       

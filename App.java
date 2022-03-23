@@ -18,16 +18,12 @@ public class App {
     
 
     public static void main(String[] args) {
-        ValidityData vData = new ValidityData();
-        vData.addTestedWord("TARES", "BYGGY");
 
-        //* Cases for quick reference: Locked Only, Invalid Only, Valid Only, Valid and Invalid, All, All Colored
-        System.out.println(vData.saveInfo("Locked Only"));
-        System.out.println(vData.saveInfo("Invalid Only"));
-        System.out.println(vData.saveInfo("Valid Only"));
-        System.out.println(vData.saveInfo("Valid and Invalid"));
-        System.out.println(vData.saveInfo("All"));
-        System.out.println(vData.saveInfo("All Colored"));
+        System.out.println(ValidityTests.getBaseValidity("EEEGGO", "GEEOOO"));
+        System.out.println(ValidityTests.getColoredValidity("EEEGGO", "GEEOOO"));
+        System.out.println("Solution: BGGYBG");
+
+
 
     }
 

@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -19,9 +20,14 @@ public class App {
 
     public static void main(String[] args) {
 
-        System.out.println(ValidityTests.getBaseValidity("EEEGGO", "GEEOOO"));
-        System.out.println(ValidityTests.getColoredValidity("EEEGGO", "GEEOOO"));
-        System.out.println("Solution: BGGYBG");
+        TestWord word1 = new TestWord("Fish");
+        System.out.println(word1);
+        
+        
+
+        
+
+        
 
 
 

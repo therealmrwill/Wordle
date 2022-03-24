@@ -25,10 +25,9 @@ public class ValidityData {
         }
     }
 
-
     //* Constructor that is only used for making copies of previous validityData
     //* Checked - no linkage issues found
-    public ValidityData(char[] lockedChars, HashMap<Integer, HashMap<Character, Boolean>> posCharData, ArrayList<Character> knownChars){
+    private ValidityData(boolean locked, char[] lockedChars, HashMap<Integer, HashMap<Character, Boolean>> posCharData, ArrayList<Character> knownChars){
         this.finalData = true;
         this.lockedChars = new char[5];
 
@@ -42,12 +41,15 @@ public class ValidityData {
 
     //* Method used to create a new (and not linked) ValidityData to store the values at that moment
     public ValidityData finalCopy(){
-        return new ValidityData(this.lockedChars, this.posCharData, this.knownChars);
+        return new ValidityData(true, this.lockedChars, this.posCharData, this.knownChars);
+    }
+    public ValidityData getCopy(){
+        return new ValidityData(false, this.lockedChars, this.posCharData, this.knownChars);
     }
 
     //* Creates a string of data to store for later usage 
     //* Super helpful for debugging when we have bigger classes using this
-    //* Cases for quick reference: Locked Only, Invalid Only, Valid Only, Valid and Invalid, All, All Colored
+    //* Cases for quick reference: toString, Locked Only, Invalid Only, Valid Only, Valid and Invalid, All, All Colored
     public String saveInfo(String dataType){
         String dataOut = "";
 
@@ -127,6 +129,24 @@ public class ValidityData {
 
         return dataOut;
     }
+    
+
+    //* Method to get all versions of the saveInfo() method at the same time
+    //* Will help with unnecessary duplication in the future
+    //* Just need to make sure if I add to saveInfo() to update this one too
+    public HashMap<String, String> saveAllInfo(){
+        HashMap<String, String> dataOut = new HashMap<>();
+
+        dataOut.put("toString", this.saveInfo("toString"));
+        dataOut.put("Locked Only", this.saveInfo("Locked Only"));
+        dataOut.put("Invalid Only", this.saveInfo("Invalid Only"));
+        dataOut.put("Valid Only", this.saveInfo("Valid Only"));
+        dataOut.put("Valid and Invalid", this.saveInfo("Valid and Invalid"));
+        dataOut.put("All", this.saveInfo("All"));
+        dataOut.put("All Colored", this.saveInfo("All Colored"));
+
+        return dataOut;
+    }
 
     //* Prints out the saveInfo of the current data
     @Override
@@ -136,7 +156,7 @@ public class ValidityData {
 
     //* Checks if word is valid given current ValidityData
     //* Needs to be clean and precise - is run a lot of times by higher level classes
-    public boolean isValid(Word word){
+    public boolean isValid(TestWord word){
         if(word.isValid() == false)
             return false;
         

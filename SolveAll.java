@@ -1,18 +1,18 @@
 import java.util.ArrayList;
 
 public class SolveAll {
-    private ArrayList<Word> guessableWordList;
-    private ArrayList<Word> testingWordList;
-    private Scoring baseScoringData;
+    private ArrayList<TestWord> guessableWordList;
+    private ArrayList<TestWord> testingWordList;
+    private WordData baseScoringData;
     private ValidityTests baseValidityData;
 
     private ArrayList<String> solvedWordData;
     private ArrayList<String> unSolvedWordData;
 
-    public SolveAll(ArrayList<Word> guessableWordList, ArrayList<Word> testingWordList){
+    public SolveAll(ArrayList<TestWord> guessableWordList, ArrayList<TestWord> testingWordList){
         this.guessableWordList = guessableWordList;
         this.testingWordList = testingWordList;
-        this.baseScoringData = new Scoring(guessableWordList);
+        this.baseScoringData = new WordData(guessableWordList);
         this.baseValidityData = new ValidityTests();
 
         this.solvedWordData = new ArrayList<>();
@@ -20,14 +20,14 @@ public class SolveAll {
     }
 
     public boolean Run(){
-        ArrayList<Word> testList = new ArrayList<>(testingWordList);
+        ArrayList<TestWord> testList = new ArrayList<>(testingWordList);
 
 
-        for(Word word : testList){
+        for(TestWord word : testList){
 
-            Scoring scoringData = new Scoring(baseScoringData);
+            WordData scoringData = new WordData(baseScoringData);
             ValidityTests validityData = new ValidityTests(baseValidityData);
-            ArrayList<Word> currGuessList = new ArrayList<>(guessableWordList);
+            ArrayList<TestWord> currGuessList = new ArrayList<>(guessableWordList);
             AutoSolver currentSolver = new AutoSolver(scoringData, validityData, currGuessList);
             String currentData = currentSolver.RunWithData(word.getWord(), App.DEBUG_LEVEL);
 

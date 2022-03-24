@@ -4,8 +4,8 @@ import java.util.Scanner;
 
 public class DataReader {
 
-   public static ArrayList<Word> readFromFile(String fileName){
-        ArrayList<Word> dataOut = new ArrayList<>();
+   public static ArrayList<TestWord> readFromFile(String fileName){
+        ArrayList<TestWord> dataOut = new ArrayList<>();
 
         try {
             Scanner fscnr = new Scanner(new File(fileName));
@@ -17,7 +17,7 @@ public class DataReader {
                 if(testWord.length() != App.WORD_LENGTH){
                     System.out.println("Error in DataReader.readFromFile( " + fileName + "): Invalid Word - " + testWord);
                 }else{
-                    dataOut.add(new Word(testWord));
+                    dataOut.add(new TestWord(testWord));
                 }
 
 

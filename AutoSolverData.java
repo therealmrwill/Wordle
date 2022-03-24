@@ -4,9 +4,9 @@ public class AutoSolverData {
     private String fullData;
     private AutoSolver currentSolver;
     private boolean solved;
-    private Word solution;
+    private TestWord solution;
     private int roundsToSolve;
-    private ArrayList<Word> guessedWords;
+    private ArrayList<TestWord> guessedWords;
     private ArrayList<ValidityTests> wordValidities;
     private ArrayList<Integer> wordsLeftList;
 
@@ -37,28 +37,28 @@ public class AutoSolverData {
         else if(debugLevel == 3){
             fullData += this.solved + ": ";
 
-            for (Word word : guessedWords) {
+            for (TestWord word : guessedWords) {
                 fullData += word.getWord() + " ";
             }
         }
         else if(debugLevel == 4){
             fullData += this.solved + ": ";
 
-            for(Word word : guessedWords) {
+            for(TestWord word : guessedWords) {
                 fullData += ValidityTests.getColoredValidity(word.getWord(), solutionString) + " ";
             }
         }
         else if(debugLevel == 5){
             fullData += this.solved + ": ";
 
-            for(Word word : guessedWords){
+            for(TestWord word : guessedWords){
                 fullData += "( " +  word.getWord() + ": "  + ValidityTests.getValidityData(word.getWord(), solutionString) + " ) ";
             }
         }
         else if(debugLevel == 6){
             fullData += this.solved + ": ";
 
-            for(Word word : guessedWords){
+            for(TestWord word : guessedWords){
                 fullData += "( " + word.getWord() + ": " + this.wordsLeftList.get(guessedWords.indexOf(word)) + " ) ";
             }
         }
@@ -80,7 +80,7 @@ public class AutoSolverData {
         return solved;
     }
 
-    public Word getSolution(){
+    public TestWord getSolution(){
         return solution;
     }
 
@@ -92,7 +92,7 @@ public class AutoSolverData {
         return roundsToSolve;
     }
 
-    public ArrayList<Word> getGuessedWords(){
+    public ArrayList<TestWord> getGuessedWords(){
         return guessedWords;
     }
 

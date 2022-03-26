@@ -1,29 +1,29 @@
 import java.io.File;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class DataReader {
 
-   public static ArrayList<TestWord> readFromFile(String fileName){
-        ArrayList<TestWord> dataOut = new ArrayList<>();
+   public static HashMap<String, TestWord> readFromFile(String fileName, boolean upperCase){
+        HashMap<String, TestWord> dataOut = new HashMap<>();
 
         try {
-            Scanner fscnr = new Scanner(new File(fileName));
+            Scanner scnr = new Scanner(new File(fileName));
             
-            while(fscnr.hasNext()){
-                String testWord = fscnr.next();
-                testWord = testWord.toUpperCase();
+            while(scnr.hasNext()){
 
-                if(testWord.length() != App.WORD_LENGTH){
-                    System.out.println("Error in DataReader.readFromFile( " + fileName + "): Invalid Word - " + testWord);
-                }else{
-                    dataOut.add(new TestWord(testWord));
+                String testWord = scnr.next();
+
+                if(upperCase){
+                    testWord = testWord.toUpperCase();
                 }
 
+                dataOut.put(testWord, new TestWord(testWord));
 
+        
             }
 
-            fscnr.close();
+            scnr.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

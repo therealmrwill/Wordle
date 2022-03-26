@@ -1,319 +1,175 @@
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class ValidityData {
-    //* Data protection parameters
-    private boolean finalData;
+    private boolean locked;
+    private HashMap<Integer, WordData> pastData;
 
-    //* Needed Parameters
-    private char[] lockedChars;
-    private HashMap<Integer, HashMap<Character, Boolean>> posCharData;
-    private ArrayList<Character> knownChars;
+    //* Only actual data that matters, all other data is based on this
+    private HashMap<Character, CharacterData> baseDataMap;
+    private HashMap<Integer, Character> lockedChars;
 
-    //* Validity already creates a new non-linkable object every time, so there is never a reason to copy it
-    //*  - Other than for data storage purposes 
-    //*     - Which is covered in this class 
+    //* Reminder to add all the constructors, once I have everything else built
     public ValidityData(){
-        this.finalData = false;
-        this.lockedChars = new char[5];
-        this.knownChars = new ArrayList<>();
-        this.posCharData = new HashMap<>();
+        this.locked = false;
+        this.pastData = new HashMap<>();
 
-        for(int position = 0; position < App.WORD_LENGTH; position++){
-            this.lockedChars[position] = '_';
-            this.posCharData.put(position, charDataFiller(App.alphabet));
+        this.baseDataMap = new HashMap<>();
+        this.lockedChars = new HashMap<>();
+
+        for (Character curChar : App.CHAR_LIST.toCharArray()) {
+            baseDataMap.put(curChar, new CharacterData(curChar));
         }
     }
+    public ValidityData(HashMap<Integer, WordData> pastData){
+        this.locked = false;
+        this.pastData = pastData;
 
-    //* Constructor that is only used for making copies of previous validityData
-    //* Checked - no linkage issues found
-    private ValidityData(boolean locked, char[] lockedChars, HashMap<Integer, HashMap<Character, Boolean>> posCharData, ArrayList<Character> knownChars){
-        this.finalData = true;
-        this.lockedChars = new char[5];
-
-        for(int position = 0; position < lockedChars.length; position++){
-            this.lockedChars[position] = lockedChars[position];
+        ValidityData previousData = new ValidityData();
+        for(Integer wordAdded : pastData.keySet()){
+            previousData.addWord(pastData.get(wordAdded));
         }
 
-        this.posCharData = new HashMap<>(posCharData);
-        this.knownChars = new ArrayList<>(knownChars);
+        this.baseDataMap = new HashMap<>(previousData.baseDataMap);
+        this.lockedChars = new HashMap<>(previousData.lockedChars);
+
     }
 
-    //* Method used to create a new (and not linked) ValidityData to store the values at that moment
-    public ValidityData finalCopy(){
-        return new ValidityData(true, this.lockedChars, this.posCharData, this.knownChars);
-    }
-    public ValidityData getCopy(){
-        return new ValidityData(false, this.lockedChars, this.posCharData, this.knownChars);
-    }
 
-    //* Creates a string of data to store for later usage 
-    //* Super helpful for debugging when we have bigger classes using this
-    //* Cases for quick reference: toString, Locked Only, Invalid Only, Valid Only, Valid and Invalid, All, All Colored
-    public String saveInfo(String dataType){
-        String dataOut = "";
+    //* Only Data Changing methods
+    public void addWord(WordData data){
+        if(data.isValid() && this.locked == false){
+            this.pastData.put(pastData.size(), data);
 
-        if(!dataType.equals("toString")){
-            dataOut += "\nValidityData: ";
-        }
-        
+            HashMap<Integer, Character> unFoundLockedChars = new HashMap<>(this.lockedChars);
 
-        switch(dataType){
-            case "toString":
-                for(Character curChar : lockedChars){
-                    dataOut += curChar;
-                }; 
-                break; 
-            case "Locked Only":
-                for(Character curChar : lockedChars){
-                    dataOut += curChar;
-                }; 
-                break;
-            case "Invalid Only":
-                dataOut += "Invalid: ";
-                for(Integer position : posCharData.keySet()){
-                    dataOut += "\n(Pos: " + position + ":";
-                    for(Character curChar : posCharData.get(position).keySet()){
-                        if(posCharData.get(position).get(curChar).booleanValue() == false){
-                            dataOut += " " + curChar;
+            //* Start with green letters in the word
+            HashMap<Character, Set<Integer>> greenData = new HashMap<>(data.getGreenInfo());
+            for (Character greenChar : greenData.keySet()) {
+                for(Integer position : greenData.get(greenChar)){
+                    if(lockedChars.containsKey(position)){
+                        if(lockedChars.get(position) != greenChar){
+                            System.out.printf("Error in ValidityData.addWord(%s): Position %d has already been found", data.toString(), position);
                         }
+
+                        //* Remove the character from unFoundLockedChars
+                        unFoundLockedChars.remove(position);
                     }
-                    dataOut += ")";
-                } 
-                break;
-            case "Valid Only":
-                dataOut += "Valid ";
-                    for(Integer position : posCharData.keySet()){
-                        dataOut += "\n(Pos: " + position + ":";
-                        for(Character curChar : posCharData.get(position).keySet()){
-                            if(posCharData.get(position).get(curChar).booleanValue() == true){
-                                dataOut += " " + curChar;
-                            }
-                        }
-                        dataOut += ")";
-                    } 
-                    break;
-            case "Valid and Invalid":
-                dataOut += this.saveInfo("Valid Only") + "\n";
-                dataOut += this.saveInfo("Invalid Only") + "\n";
-                break;
-            case "All":
-                dataOut += "All Data ";
-                for(Integer position : posCharData.keySet()){
-                    dataOut += "\n(Pos: " + position + ":";
-                    for(Character curChar : posCharData.get(position).keySet()){
-                        dataOut += " " + curChar + ":" + posCharData.get(position).get(curChar).booleanValue();
+                    else{
+                        lockedChars.put(position, greenChar);
+                        baseDataMap.get(greenChar).addGreen(position);
                     }
-                    dataOut += ")";
-                } 
-                break; 
-            case "All Colored":
-                dataOut += "Colored Data ";
-                for(Integer position : posCharData.keySet()){
-                    dataOut += "\n(Pos: " + position + ":";
-                    for(Character curChar : posCharData.get(position).keySet()){
-                        if(posCharData.get(position).get(curChar).booleanValue() == true){
-                            dataOut += " " + App.ANSI_GREEN + curChar + App.ANSI_RESET;
-                        }else{
-                            dataOut += " " + App.ANSI_RED + curChar + App.ANSI_RESET;
-                        }
-                        
-                    }
-                    dataOut += ")";
                 }
-                break;
-            default:
-                System.out.println("Error in ValidityData.saveInfo(): Invalid data type (" + dataType + ")");
-                dataOut += this.saveInfo("All");
+            }
+            greenData = null;
+
+
+            //* Now have to figure out how many of each character could be positioned wrongly
+            HashMap<Character, Integer> numPosWrong = new HashMap<>();
+            for (Character curChar : unFoundLockedChars.values()) {
+                if(numPosWrong.containsKey(curChar)){
+                    numPosWrong.put(curChar, numPosWrong.get(curChar) + 1);
+                }
+                else{
+                    numPosWrong.put(curChar, 1);
+                }
+            }
+            
+
+            //* Now we are free to check yellows
+            //* Knowing that if the yellow is a character positioned wrongly then we add it as a black
+            //* We pull in our blackData here too, so that we can da
+            HashMap<Character, Set<Integer>> yellowData = new HashMap<>(data.getYellowInfo());
+            HashMap<Character, Set<Integer>> blackData = new HashMap<>(data.getBlackInfo());
+
+            for(Character yellowChar : yellowData.keySet()){
+                for(Integer position : yellowData.get(yellowChar)){
+                    if(numPosWrong.containsKey(yellowChar) && numPosWrong.get(yellowChar) > 0){
+                        //* Adds the data to the list of black characters 
+                        if(blackData.containsKey(yellowChar) == false){
+                            blackData.put(yellowChar, new HashSet<>());
+                        }
+
+                        blackData.get(yellowChar).add(position);
+                        numPosWrong.put(yellowChar, numPosWrong.get(yellowChar) - 1);
+                    }else{
+                        baseDataMap.get(yellowChar).addYellow(position);
+                    }
+
+                }
+            }
+
+            //* Then we can add all the black characters after
+            //* Do not need to do any checking with the black characters
+            for(Character blackChar : blackData.keySet()){
+                for(Integer position : blackData.get(blackChar)){
+                    baseDataMap.get(blackChar).addBlack(position);
+                }
+            }
+
+        }
+        else if(locked == false){
+            System.out.printf("Error in ValidityData.addWord(%s): Word is invalid %n", data.toString());
+        }
+        else{
+            System.out.println("Error in ValidityData.addWord(%s): This version of validityData is locked");
+        }
+        
+        this.updateLockedChars();
+    }
+    public void setLocked(){
+        this.locked = true;
+    }
+
+    //* Data Checking Methods
+    public boolean isValid(TestWord word){
+        if(word.isValid() == false){
+            return false;
         }
 
-        return dataOut;
-    }
-    
+        for(Character curChar : word.getDuplicateData().keySet()){
+            CharacterData curData = baseDataMap.get(curChar);
+            int numberOfChars = curData.getNumOfGreens() + curData.getNumOfYellows();
 
-    //* Method to get all versions of the saveInfo() method at the same time
-    //* Will help with unnecessary duplication in the future
-    //* Just need to make sure if I add to saveInfo() to update this one too
-    public HashMap<String, String> saveAllInfo(){
-        HashMap<String, String> dataOut = new HashMap<>();
-
-        dataOut.put("toString", this.saveInfo("toString"));
-        dataOut.put("Locked Only", this.saveInfo("Locked Only"));
-        dataOut.put("Invalid Only", this.saveInfo("Invalid Only"));
-        dataOut.put("Valid Only", this.saveInfo("Valid Only"));
-        dataOut.put("Valid and Invalid", this.saveInfo("Valid and Invalid"));
-        dataOut.put("All", this.saveInfo("All"));
-        dataOut.put("All Colored", this.saveInfo("All Colored"));
-
-        return dataOut;
-    }
-
-    //* Prints out the saveInfo of the current data
-    @Override
-    public String toString(){
-        return saveInfo("toString");
-    }
-
-    //* Checks if word is valid given current ValidityData
-    //* Needs to be clean and precise - is run a lot of times by higher level classes
-    public boolean isValid(TestWord word){
-        if(word.isValid() == false)
-            return false;
-        
-        String wordString = word.getName();
-        ArrayList<Character> neededChars = new ArrayList<>(knownChars);
-
-        for(int position = 0; position < wordString.length(); position++){
-
-            char currentChar = wordString.charAt(position);
-
-            //* This method really isn't needed, all information in lockedChars is stored in posCharData anyways
-            //* I'm just leaving it here so that if there are issues you can try turning it back on
-            // if(Character.isLetter(lockedChars[position]) && lockedChars[position] != currentChar){
-            //     return false;
-            // }
-            
-            if(posCharData.get(position).containsKey(currentChar)){
-                if(posCharData.get(position).get(currentChar).booleanValue() == false){
+            for(Integer position : word.getDuplicateData().get(curChar)){
+                if(curData.getPosValidity().get(position) == false){
+                    word.setIsValid(false);
                     return false;
                 }
-            }
-            else{
-                System.out.println("Error in ValidityData.isValid() with word " + word + ": contains unknown character: " + currentChar);
+                else{
+                    numberOfChars--;
+                }
             }
 
-            if(neededChars.contains(currentChar)){
-                neededChars.remove(neededChars.lastIndexOf(currentChar));
+            if(numberOfChars > 0){
+                word.setIsValid(false);
+                return false;
             }
         }
 
-        if(neededChars.size() > 0){
-            return false;
-        }
 
         return true;
     }
 
-    //* Protects Object from any future changes
-    //* Allows us to check if the object we are trying to change is final or not
-    public void makeFinal() {
-        this.finalData = true;
-    }
-    public boolean isFinalData() {
-        return finalData;
-    }
-
-    //* Adds new data to the validity parameters
-    //* Allows for more removal of words in the future
-    public void addTestedWord(String word, String wordValidity){
-        if(finalData){
-            System.out.println("Error in ValidityData.addTestedWord(" + word + "): Data is marked as final and cannot be changed");
-            return;
-        }
-
-        if(word.length() != wordValidity.length()){
-            System.out.println("Error in ValidityData.addTestedWord( " + word + ", " + wordValidity + "): Word sizes do not match");
-            return;
-        }
-        
-        
-        for(int position = 0; position < wordValidity.length(); position++){
-            switch(wordValidity.charAt(position)){
-                case 'G': addGreenChar(word.charAt(position), position); break;
-                case 'Y': addYellowChar(word.charAt(position), position); break;
-                case 'B': addBlackChar(word.charAt(position), position); break;
-                case 'R': ; break;
-                default: System.out.println("Error in ValidityData.addTestedWord: " + wordValidity.charAt(position) + " is not a valid response");
-            }
-            }
-        
-    }
-
-    //* Adds a 'Green' Character to data
-    private void addGreenChar(Character letter, int position){
-        //* Checking first if we are attempting to add invalid data
-        //* Then checking if we already know the data
-        //* If neither of those are true, then we add the data
-        if(Character.isLetter(lockedChars[position])){
-            if(lockedChars[position] != letter){
-                System.out.println("Error in ValidityData.addTestedWord.addGreenChar(" + letter + "): Attempting to change a value that has already been found");
-                return;
-            }
-            else{
-                return;
-            }
-        }
-        
-        //* Adds data to lockedChars[]    
-        lockedChars[position] = letter;
-        
-        //* Checks if we located a previously Yellow Character
-        //* If we did remove it from the yellow character list
-        if(knownChars.contains(letter)){
-            knownChars.remove(knownChars.lastIndexOf(letter));
-        }
-
-        //* Set every value other than letter to false at this position
-        for(Character curChar : posCharData.get(position).keySet()){
-            if(curChar != letter){
-                addInvalidChar(curChar, position);
-            }
-        }
-        
-
-    }
-
-    //* Adds a 'Yellow' Character to data
-    private void addYellowChar(Character letter, int position){
-        //* Only adds a known character if it isn't already in the list
-        //* Means that words with multiple of the same letter being yellow will be solved slower
-        //*  - I don't think this will cause issues, but try to actually write tests to see if it does
-        if(!knownChars.contains(letter)){
-            knownChars.add(letter);
-        }
-        
-        //* Should be fine to add it regardless - it will check if letter is already not allowed
-        addInvalidChar(letter, position);
-    }
-
-    //* Adds a 'Black' Character to data
-    private void addBlackChar(Character letter, int position){
-        addInvalidChar(letter, position);
-
-        for(int testPos = 0; testPos < App.WORD_LENGTH; testPos++){
-            //* Adding rules to help with 'Fake blacks' - or blacks or a letter that is already known
-            //* If position in lockedChars doesn't equal our value
-            //* And knownChars doesn't contain our letter
-            if(lockedChars[testPos] != letter && !knownChars.contains(letter)){
-                addInvalidChar(letter, testPos);
-            }
-        } 
-    }
-
-    //* Adds an Invalid Character to posInvalidChars
-    private void addInvalidChar(Character letter, int position){
-        if(posCharData.get(position).containsKey(letter)){
-            if(posCharData.get(position).get(letter).booleanValue()){
-                posCharData.get(position).put(letter, false);
-            }
-        }
-        else{
-            System.out.println("Error in ValidityData.addInvalidChar(): " + letter + " not a known character");
-        }
-
-
-        
-        
-
-    }
-
-    private HashMap<Character, Boolean> charDataFiller(String characters){
-        HashMap<Character, Boolean> dataOut = new HashMap<>();
-        for (Character character : characters.toCharArray()) {
-            dataOut.put(character, true);
-        }
-        return dataOut;
-    }
+    //* Data Reading Methods
     
-  
+
+
+
+    //Todo: Need to have an update Locked chars method because we might find one inside the baseDataMap
+    public void updateLockedChars(){
+        for(Character curChar : baseDataMap.keySet()){
+            for(Integer position : baseDataMap.get(curChar).getSetPositions()){
+                if(lockedChars.containsKey(position)){
+                    if(lockedChars.get(position) != curChar){
+                        System.out.printf("Error: Character(%c) assumed greens that were not accurate %n", curChar);
+                    }
+                }else{
+                    lockedChars.put(position, curChar);
+                }
+            }
+        }
+    }
 }

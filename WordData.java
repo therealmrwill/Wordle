@@ -1,178 +1,245 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class WordData {
-    //* Variables to make sure non-linkable
-    private boolean finalData;
+    private String word;
+    private boolean valid;
+    private HashMap<Character, Set<Integer>> greenInfo;
+    private HashMap<Character, Set<Integer>> yellowInfo;
+    private HashMap<Character, Set<Integer>> blackInfo;
 
-    private int round;
-    private ValidityData validityData;
-    private HashMap<Character, Letter> letterMap;
-    private HashMap<Character, Letter> divMap;
-    private HashMap<Integer, HashMap<Character, Letter>> posLetterMap;
-    
-    public WordData(HashMap<String, TestWord> wordData){
-        this.finalData = false;
 
-        this.round = 0;
-        this.validityData = new ValidityData();
-        this.letterMap = blankMap();
-        this.divMap = blankMap();
-        this.posLetterMap = new HashMap<>();
+    //* Rules for using this method
+    //* 1. Words must be the same size
+    //* 2. Data must be in the form GYB
+    public WordData(String word, char[] data){
+        this.word = word;
+        this.valid = true;
+        this.greenInfo = new HashMap<>();
+        this.yellowInfo = new HashMap<>();
+        this.blackInfo = new HashMap<>();
 
-        for(int position = 0; position < App.WORD_LENGTH; position++){
-            posLetterMap.put(position, blankMap());
+
+        if(word.length() != data.length){
+            System.out.printf("Error in WordData(%s , %s): Word Size (%d) doesn't match data size (%d)", word, data, word.length(), data.length);
+            valid = false;
         }
-        
-        this.fillMaps(wordData);
-        
-    }
-
-        //* Base scoring helpers
-        private HashMap<Character, Letter> blankMap(){
-            HashMap<Character, Letter> dataOut = new HashMap<>();
-
-            for(Character letter : App.alphabet.toCharArray()){
-                dataOut.put(letter, new Letter(letter));
-            }
-
-            return dataOut;
-        }
-        private void fillMaps(HashMap<String, TestWord> wordData) {
-            for(String word : wordData.keySet()){
-                addWord(word);
-            }
-        }
-
-    //* Public methods that allow for changing of data
-    public void addWord(String word){
-        updateAllMaps(word, 1.0);
-    }
-    public void removeWord(String word){
-        updateAllMaps(word, -1.0);
-    }
-
-    //* Only method that truly will change any data other than validity
-    //* Is protected for links and copies will not be able to be changed
-    private void updateAllMaps(String word, Double changeAmount) {
-
-        if(finalData = true){
-            System.out.printf("Error in Scoring.updateAllMaps(%s, %.0f): Instance of scoring is marked final and cannot be changed %n", word, changeAmount);
-            return;
-        }
-
-        if(word.length() != App.WORD_LENGTH){
-            System.out.printf("Error in Scoring.updateAllMaps(%s, %.1f): Word size %d invalid %n", word, changeAmount, word.length()); 
-            return;
-        }
-
-        ArrayList<Character> prevChars = new ArrayList<>();
 
         for(int position = 0; position < word.length(); position++){
-            Character curChar = word.charAt(position);
+            Character currentChar = word.charAt(position);
+            Character currentData = data[position];
 
-            letterMap.get(curChar).changeScore(changeAmount);
-            posLetterMap.get(position).get(curChar).changeScore(changeAmount);
-
-            if(!prevChars.contains(curChar)){
-                divMap.get(curChar).changeScore(changeAmount);
+            switch(currentData){
+                case 'G': 
+                    if(greenInfo.containsKey(currentChar) == false)
+                        greenInfo.put(currentChar, new HashSet<>());
+                        
+                    greenInfo.get(currentChar).add(position); break;
+                case 'Y': 
+                    if(yellowInfo.containsKey(currentChar) == false)
+                        yellowInfo.put(currentChar, new HashSet<>());
+                
+                    yellowInfo.get(currentChar).add(position); break;
+                case 'B': 
+                    if(blackInfo.containsKey(currentChar) == false)
+                        blackInfo.put(currentChar, new HashSet<>());
+                
+                    blackInfo.get(currentChar).add(position); break;
+                case 'R': ; break;
+                default: 
+                System.out.printf("Error in WordData(%s , %s): %c not valid data Type (G,Y,B) %n", word, data, currentData);
+                this.valid = false; break;
             }
-        } 
-    }
 
-
-    //* Constructor which is only used to create a copy of a previous scoring data
-    //* Only real use should be so that I don't have to rescore all words at the beginning of every new Solve
-    private WordData(boolean finalData, int round, ValidityData validityData, HashMap<Character, Letter> letterMap, HashMap<Character, Letter> divMap, HashMap<Integer, HashMap<Character, Letter>> posLetterMap){
-        this.finalData = finalData;
-        this.round = round;
-        this.validityData = validityData;
-        this.letterMap = new HashMap<>(letterMap);
-        this.divMap = new HashMap<>(divMap);
-        this.posLetterMap = new HashMap<>(posLetterMap);
-    }
-
-
-
-    //*Getters and Setters
-    public WordData getLockedCopy(){
-        return new WordData(true, this.round + 0, this.validityData.finalCopy(), new HashMap<>(this.letterMap), new HashMap<>(this.divMap), new HashMap<>(this.posLetterMap));
-    }
-    public WordData getCopy(){ 
-        return new WordData(false, this.round + 0, validityData.finalCopy(), new HashMap<>(this.letterMap), new HashMap<>(this.divMap), new HashMap<>(this.posLetterMap));
-    }
-    public void addRound(){
-        if(finalData == true){
-            System.out.println("Error in Scoring.addRound(): Instance of scoring is marked as final");
-            return;
         }
 
-        this.round++;
+
     }
-    public void setValidityData(ValidityData validityData){
-        if(finalData == true){
-            System.out.println("Error in Scoring.resetValidityData(): Instance of scoring is marked as final");
-            return;
+
+    public WordData(String word, String solution){
+        WordData realData = new WordData(word, getSolution(word, solution));
+        this.word = word;
+        this.valid = realData.valid;
+        this.greenInfo = new HashMap<>(realData.greenInfo);
+        this.yellowInfo = new HashMap<>(realData.yellowInfo);
+        this.blackInfo = new HashMap<>(realData.blackInfo);
+    }
+
+    private char[] getSolution(String testWord, String solution) {
+        char[] dataOut = new char[testWord.length()];
+
+        if(testWord.length() != solution.length()){
+            System.out.printf("Error in WordData.getSolution(%s, %s): TestWord Size (%d) and solution size (%d) do not match");
+            for(int i = 0; i < testWord.length(); i++){
+                dataOut[i] = 'E';
+            }
+            return dataOut;
         }
 
-        this.validityData = validityData.finalCopy();
-    }
-    public void setFinal(){
-        this.finalData = true;
-    }
+        //* However many times a letter shows up in the solution is the amount of times it can show in data
+        //* If a position is green it gets priority on taking from that list
+        //* Then the first yellows in the word get priority 
 
+        //* This is storing how many times each word shows up in the solution
+        HashMap<Character, Integer> solutionData = new HashMap<>();
+             
+        //* 3 HashMaps one for each type of Data (G, Y, B)
+        HashMap<Character, Set<Integer>> greenData = new HashMap<>();
+        HashMap<Character, Set<Integer>> yellowData = new HashMap<>(); 
+        HashMap<Character, Set<Integer>> blackData = new HashMap<>();
 
-    //* Main use of this whole class
-    //* Should be the main focus of any changes once this whole thing is finally functioning
-    //* Should has all known data to score provided - should be able to think of tons of combinations
-    public double scoreWord(TestWord word){
-        double score = 0;
-        ArrayList<Character> prevChars = new ArrayList<>();
-        String wordString = new String(word.getName());
+        for(int position = 0; position < testWord.length(); position++){
+            Character curChar = testWord.charAt(position);
+            Character solutionChar = solution.charAt(position);
 
-        for(int position = 0; position < wordString.length(); position++){
-            int charScore = 0;
-            char curChar = wordString.charAt(position);
+            if(curChar == solutionChar){
+                if(greenData.containsKey(curChar) == false)
+                    greenData.put(curChar, new HashSet<>());
+                greenData.get(curChar).add(position);
+            }
+            else if(solution.contains(curChar.toString())){
+                if(yellowData.containsKey(curChar) == false)
+                    yellowData.put(curChar, new HashSet<>());
+                yellowData.get(curChar).add(position); 
+            }
+            else{
+                if(blackData.containsKey(curChar) == false)
+                    blackData.put(curChar, new HashSet<>());
+                blackData.get(curChar).add(position);
+            }
+
+            if(solutionData.containsKey(solutionChar) == false){
+                solutionData.put(solutionChar, 1);
+            }
+            else{
+                solutionData.put(solutionChar, solutionData.get(solutionChar) + 1);
+            }
+
+        }
+
+        //* First loop through all the green locations - these are 100% part of solution
+        for (Character curChar : greenData.keySet()) {
+            for(Integer position : greenData.get(curChar)){
+                if(solutionData.get(curChar) > 0){
+                    solutionData.put(curChar, solutionData.get(curChar) - 1);
+                    dataOut[position] = 'G';
+                }else{
+                    System.out.printf("Error in WordData.getSolution(%s , $s): Unexpected Green Found %n", testWord, solution);
+                    dataOut[position] = 'E';
+                }
+            }
+        }
+
+        //* Then loop through all of the yellow locations 
+        //* Loop through them in order of how they appear
+        //* Yellow means the word has to be in the solution data somewhere
+        for(Character curChar : yellowData.keySet()){
+
+            ArrayList<Integer> orderedPositions = new ArrayList<>();
+            for(Integer position : yellowData.get(curChar)){
+                orderedPositions.add(position);
+            }
             
-            charScore += this.letterMap.get(curChar).getScore();
-            charScore += this.divMap.get(curChar).getScore();
-            charScore += this.posLetterMap.get(position).get(curChar).getScore();
+            Collections.sort(orderedPositions);
 
-            if(prevChars.contains(curChar)){
-                charScore /= 1.5;
+            for(Integer position : orderedPositions) {
+                if(solutionData.get(curChar) > 0){
+                    solutionData.put(curChar, solutionData.get(curChar) - 1);
+                    dataOut[position] = 'Y'; 
+                }
+                else{
+                    dataOut[position] = 'B';
+                }
             }
-
-            prevChars.add(curChar);
-            score += charScore;
-
+                
         }
 
-        if(validityData.isValid(word) == false){
-            score = 0;
+        //* Then finally loop through all of the black locations
+        //* They should not need any checking, just get sent straight through
+        for(Character curChar : blackData.keySet()){
+            for(Integer position : blackData.get(curChar)){
+                dataOut[position] = 'B';
+            }
         }
 
-        return score;
+        return dataOut;
     }
 
-   
+    public String getInfo(boolean colored){
+        String dataOut = this.word + ": ";
 
+        if(colored){
+            HashMap<Integer, Character> validityData = getValidity();
+            for(int position = 0; position < this.word.length(); position++){
+                Character curChar = this.word.charAt(position);
 
-    //* Creates a string of data to store for later usage 
-    //* Super helpful for debugging when we have bigger classes using this
-    //* Cases for quick reference: toString
-    public String saveInfo(String dataLevel){
-        String dataOut = "";
-
-        switch(dataLevel){
+                switch(validityData.get(position)){
+                    case 'G': dataOut += ColorData.green + curChar + ColorData.reset; break;
+                    case 'Y': dataOut += ColorData.yellow + curChar + ColorData.reset; break;
+                    case 'B': dataOut += ColorData.silver + curChar + ColorData.reset; break;
+                    case 'E': dataOut += ColorData.black + curChar + ColorData.reset; break;
+                }
+            }
 
         }
+        else{
+            HashMap<Integer, Character> validityData = getValidity();
+            for(int position = 0; position < this.word.length(); position++){
+                dataOut += validityData.get(position);
+            }
+        }
+
 
 
         return dataOut;
     }
 
+    public HashMap<Integer, Character> getValidity(){
+        HashMap<Integer, Character> totalData = new HashMap<>();
+
+            for (Character curChar : greenInfo.keySet()) {
+                for (Integer position : greenInfo.get(curChar)) {
+                    totalData.put(position, 'G');
+                }
+            }
+
+            for(Character curChar : yellowInfo.keySet()){
+                for (Integer position : yellowInfo.get(curChar)){
+                    totalData.put(position, 'Y');
+                }
+            }
+
+            for(Character curChar : blackInfo.keySet()){
+                for(Integer position : blackInfo.get(curChar)){
+                    totalData.put(position, 'B');
+                }
+            }
+
+        return totalData;
+    }
+
+    public String getWord() {
+        return word;
+    }
+    public boolean isValid() {
+        return valid;
+    }
+    public HashMap<Character, Set<Integer>> getGreenInfo() {
+        return greenInfo;
+    }
+    public HashMap<Character, Set<Integer>> getYellowInfo() {
+        return yellowInfo;
+    }
+    public HashMap<Character, Set<Integer>> getBlackInfo() {
+        return blackInfo;
+    }
+
     @Override
     public String toString(){
-        return saveInfo("toString");
+        return this.getInfo(false);
     }
+
 }

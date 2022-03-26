@@ -7,30 +7,28 @@ import java.util.HashMap;
 public class App {
     public static final int WORD_LENGTH = 5;
     public static final int NUM_OF_ROUNDS = 6;
-    public static final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    public static final int DEBUG_LEVEL = 4;
-
-    //Yes I know the yellow is not yellow - I just didn't want to blind myself while testing
-    public static final String ANSI_YELLOW = "\u001b[35m";
-    public static final String ANSI_GREEN = "\u001b[32m";
-    public static final String ANSI_RED = "\u001b[31m";
-    public static final String ANSI_RESET = "\u001b[0m";
+    public static final String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    //* Valid Debug Levels: 1. Testing, 2. Production
+    public static final int DEBUG_LEVEL = 1;
+    
 
     
 
     public static void main(String[] args) {
 
-        TestWord word1 = new TestWord("Fish");
-        System.out.println(word1);
+        WordData data = new WordData("TARES", "DEPOT");
+        System.out.println(data.getInfo(true));
+
+        WordData data2 = new WordData("HEIST", "DEPOT");
+        System.out.println(data2.getInfo(true));
+
+        WordData data3 = new WordData("DEVOT", "DEPOT");
+        System.out.println(data3.getInfo(true));
+        
+
+
         
         
-
-        
-
-        
-
-
-
     }
 
 
@@ -41,4 +39,3 @@ public class App {
 }
 
 
-   

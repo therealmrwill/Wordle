@@ -15,20 +15,25 @@ public class App {
     
 
     public static void main(String[] args) {
+        HashMap<String, TestWord> words = DataReader.readFromFile("DataFiles/FullWordList.txt", true);
 
-        WordData data = new WordData("TARES", "DEPOT");
-        System.out.println(data.getInfo(true));
 
-        WordData data2 = new WordData("HEIST", "DEPOT");
-        System.out.println(data2.getInfo(true));
-
-        WordData data3 = new WordData("DEVOT", "DEPOT");
-        System.out.println(data3.getInfo(true));
+        ValidityData validity = new ValidityData();
         
+        validity.addWord(new WordData("TARES", "BYBBB".toCharArray()));
+        validity.addWord(new WordData("BLACK", "BGYBB".toCharArray()));
+        validity.addWord(new WordData("ILIAD", "BGBYB".toCharArray()));
+        validity.addWord(new WordData("ALOHA", "GGYBB".toCharArray()));
+
+        HashMap<String, TestWord> validWords = new HashMap<>();
+        for (TestWord word : words.values()) {
+            if(validity.isValid(word)){
+                validWords.put(word.getName(), word);
+            }
+        }
 
 
-        
-        
+        System.out.println("Completed");
     }
 
 

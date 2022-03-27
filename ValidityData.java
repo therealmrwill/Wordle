@@ -2,10 +2,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-
 public class ValidityData {
     private boolean locked;
     private HashMap<Integer, WordData> pastData;
+    private HashMap<String, Object> storedData;
 
     //* Only actual data that matters, all other data is based on this
     private HashMap<Character, CharacterData> baseDataMap;
@@ -15,6 +15,7 @@ public class ValidityData {
     public ValidityData(){
         this.locked = false;
         this.pastData = new HashMap<>();
+        this.storedData = new HashMap<>();
 
         this.baseDataMap = new HashMap<>();
         this.lockedChars = new HashMap<>();
@@ -22,19 +23,26 @@ public class ValidityData {
         for (Character curChar : App.CHAR_LIST.toCharArray()) {
             baseDataMap.put(curChar, new CharacterData(curChar));
         }
+
+        this.updateStoredData();
     }
     public ValidityData(HashMap<Integer, WordData> pastData){
         this.locked = false;
         this.pastData = pastData;
 
+        
+
         ValidityData previousData = new ValidityData();
+
+        this.storedData = previousData.storedData;
+
         for(Integer wordAdded : pastData.keySet()){
             previousData.addWord(pastData.get(wordAdded));
         }
 
         this.baseDataMap = new HashMap<>(previousData.baseDataMap);
         this.lockedChars = new HashMap<>(previousData.lockedChars);
-
+        this.updateLockedChars();
     }
 
 
@@ -84,7 +92,11 @@ public class ValidityData {
             HashMap<Character, Set<Integer>> yellowData = new HashMap<>(data.getYellowInfo());
             HashMap<Character, Set<Integer>> blackData = new HashMap<>(data.getBlackInfo());
 
+            
+
             for(Character yellowChar : yellowData.keySet()){
+                int numOfPrevYellows = this.baseDataMap.get(yellowChar).getNumOfYellows();
+
                 for(Integer position : yellowData.get(yellowChar)){
                     if(numPosWrong.containsKey(yellowChar) && numPosWrong.get(yellowChar) > 0){
                         //* Adds the data to the list of black characters 
@@ -95,7 +107,20 @@ public class ValidityData {
                         blackData.get(yellowChar).add(position);
                         numPosWrong.put(yellowChar, numPosWrong.get(yellowChar) - 1);
                     }else{
-                        baseDataMap.get(yellowChar).addYellow(position);
+                        if(numOfPrevYellows > 0){
+                            if(blackData.containsKey(yellowChar) == false){
+                                blackData.put(yellowChar, new HashSet<>());
+                            }
+    
+                            blackData.get(yellowChar).add(position);
+                            
+                            numOfPrevYellows--;
+                        }
+                        else{
+                            baseDataMap.get(yellowChar).addYellow(position);
+                        }
+
+                        
                     }
 
                 }
@@ -118,9 +143,11 @@ public class ValidityData {
         }
         
         this.updateLockedChars();
+        this.updateStoredData();
     }
     public void setLocked(){
         this.locked = true;
+        this.updateStoredData();
     }
 
     //* Data Checking Methods
@@ -129,11 +156,30 @@ public class ValidityData {
             return false;
         }
 
+        HashMap<Character, Integer> numNeededByChar = this.getNumNeededByChar();
+
         for(Character curChar : word.getDuplicateData().keySet()){
             CharacterData curData = baseDataMap.get(curChar);
             int numberOfChars = curData.getNumOfGreens() + curData.getNumOfYellows();
 
+            if(numNeededByChar.containsKey(curChar)){
+                if(numberOfChars >= numNeededByChar.get(curChar)){
+                    numNeededByChar.remove(curChar);
+                }
+            }
+
+
             for(Integer position : word.getDuplicateData().get(curChar)){
+                if(lockedChars.containsKey(position)){
+                    if(lockedChars.get(position) != curChar){
+                        return false;
+                    }
+                }
+                
+                
+
+
+
                 if(curData.getPosValidity().get(position) == false){
                     word.setIsValid(false);
                     return false;
@@ -149,16 +195,158 @@ public class ValidityData {
             }
         }
 
+        if(numNeededByChar.size() > 0){
+            return false;
+        }
+
 
         return true;
     }
 
     //* Data Reading Methods
-    
+    public HashMap<Integer, HashMap<Character, Boolean>> getValidityMap(){
+        HashMap<Integer, HashMap<Character, Boolean>> dataOut = new HashMap<>();
+
+        for(Character curChar : baseDataMap.keySet()){
+
+            for(Integer position : baseDataMap.get(curChar).getPosValidity().keySet()){
+                if(dataOut.containsKey(position) == false){
+                    dataOut.put(position, new HashMap<>());
+                }
+
+                dataOut.get(position).put(curChar, baseDataMap.get(curChar).getPosValidity().get(position));
+            }
+        }
+
+
+        return dataOut;
+    }
+    public HashMap<Integer, Set<Character>> getValidByPos(){
+        HashMap<Integer, HashMap<Character, Boolean>> validityMap = this.getValidityMap();
+        HashMap<Integer, Set<Character>> dataOut = new HashMap<>();
+
+        for(Integer position : validityMap.keySet()){
+            dataOut.put(position, new HashSet<>());
+            for(Character curChar : validityMap.get(position).keySet()){
+                if(validityMap.get(position).get(curChar) == true){
+                    dataOut.get(position).add(curChar);
+                }
+            }
+
+
+        }
+
+
+        return dataOut;
+    }
+    public HashMap<Integer, Integer> getNumValidByPos(){
+        HashMap<Integer, Set<Character>> validByPos = this.getValidByPos();
+        HashMap<Integer, Integer> dataOut = new HashMap<>();
+        
+        for(Integer position : validByPos.keySet()){
+            dataOut.put(position, validByPos.get(position).size());
+        }
+        
+        return dataOut;
+    }
+
+    public HashMap<Character, CharacterData> getBaseDataMap() {
+        return baseDataMap;
+    }
+    public HashMap<Character, Integer> getNumValidByChar(){
+        HashMap<Character, Integer> dataOut = new HashMap<>();
+        
+        for(Character curChar : this.baseDataMap.keySet()){
+            int validPositions = 0;
+
+            for (Integer position : this.baseDataMap.get(curChar).getPosValidity().keySet()) {
+                if(this.baseDataMap.get(curChar).getPosValidity().get(position) == true){
+                    validPositions++;
+                }
+            }
+
+            dataOut.put(curChar, validPositions);
+        }
+
+
+        return dataOut;
+    }
+    public HashMap<Character, Integer> getNumTestableByChar(){
+        HashMap<Character, Integer> dataOut = new HashMap<>();
+        
+        for(Character curChar : this.baseDataMap.keySet()){
+            dataOut.put(curChar, this.baseDataMap.get(curChar).getTestablePositions().size());
+        }
+        
+        return dataOut;
+    }
+    public HashMap<Character, Integer> getNumNeededByChar(){
+        HashMap<Character, Integer> dataOut = new HashMap<>();
+
+        for(Character curChar : this.baseDataMap.keySet()){
+            int numberNeeded = this.baseDataMap.get(curChar).getNumOfGreens() + this.baseDataMap.get(curChar).getNumOfYellows();
+
+            if(numberNeeded > 0){
+                dataOut.put(curChar, numberNeeded);
+            }
+        }
+
+
+        return dataOut;
+    }
 
 
 
-    //Todo: Need to have an update Locked chars method because we might find one inside the baseDataMap
+    public HashMap<Integer, Character> getLockedChars() {
+        return lockedChars;
+    }
+    public Integer getNumLockedChars(){
+        return this.lockedChars.size();
+    }
+
+    public HashMap<Integer, WordData> getPastData() {
+        return pastData;
+    }
+
+    public void updateStoredData(){
+        this.storedData = null;
+        this.storedData = new HashMap<>();
+        
+        this.storedData.put("Validity Map", this.getValidityMap());
+        this.storedData.put("Valid By Position", this.getValidByPos());
+        this.storedData.put("# Valid By Position", this.getNumValidByPos());
+
+        this.storedData.put("Base Data Map", this.getBaseDataMap());
+        this.storedData.put("# Valid by Char", this.getNumValidByChar());
+        this.storedData.put("# Testable by Char", this.getNumTestableByChar());
+
+        this.storedData.put("Locked Chars", this.getLockedChars());
+        this.storedData.put("# of Locked Chars", this.getNumLockedChars());
+        this.storedData.put("Past Data", this.getPastData());
+    }
+
+    public String getColoredValidityMap(){
+        HashMap<Integer, HashMap<Character, Boolean>> validityMap = this.getValidityMap();
+        String dataOut = "";
+
+        for(Integer position : validityMap.keySet()){
+            dataOut += "\n" + position + ": ";
+            for(Character curChar : validityMap.get(position).keySet()){
+                if(validityMap.get(position).get(curChar) == true){
+                    dataOut += ColorData.green + curChar + ColorData.reset;
+                }
+                else{
+                    dataOut += ColorData.red + curChar + ColorData.reset;
+                }
+            }
+        }
+
+        return dataOut;
+    }
+
+
+
+    //* This method updates the locked chars variable using the baseDataMap
     public void updateLockedChars(){
         for(Character curChar : baseDataMap.keySet()){
             for(Integer position : baseDataMap.get(curChar).getSetPositions()){

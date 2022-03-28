@@ -9,7 +9,9 @@ public class TestWord implements Comparable<TestWord>{
     //* Parameters
     private String name;
     private Double score;
+    private Double chanceCorrect;
     private Boolean isValid;
+    
     private HashMap<Character, Set<Integer>> duplicateData;
 
     //* Constructors
@@ -101,6 +103,9 @@ public class TestWord implements Comparable<TestWord>{
         }
         
     }
+    public void setChanceCorrect(Double chanceCorrect) {
+        this.chanceCorrect = chanceCorrect;
+    }
     public void setIsValid(Boolean valid){
         if(!locked){
             this.isValid = valid;
@@ -149,9 +154,15 @@ public class TestWord implements Comparable<TestWord>{
     @Override
     public int compareTo(TestWord otherWord) {
         int compare = otherWord.score.compareTo(this.score);
+        
+        if(compare == 0){
+            compare = otherWord.chanceCorrect.compareTo(this.chanceCorrect);
+        }
+
         if(compare == 0){
             compare = this.name.compareTo(otherWord.name);
         }
+
         return compare;
         
     }

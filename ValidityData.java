@@ -68,6 +68,13 @@ public class ValidityData {
                     else{
                         lockedChars.put(position, greenChar);
                         baseDataMap.get(greenChar).addGreen(position);
+
+                        for(Character curChar : baseDataMap.keySet()){
+                            if(curChar != greenChar){
+                                baseDataMap.get(curChar).anotherGreenFound(position);
+                            }
+                        }
+
                     }
                 }
             }
@@ -176,10 +183,6 @@ public class ValidityData {
                     }
                 }
                 
-                
-
-
-
                 if(curData.getPosValidity().get(position) == false){
                     word.setIsValid(false);
                     return false;
@@ -356,6 +359,7 @@ public class ValidityData {
                     }
                 }else{
                     lockedChars.put(position, curChar);
+                    
                 }
             }
         }

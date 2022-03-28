@@ -24,7 +24,7 @@ public class WordData {
 
 
         if(word.length() != data.length){
-            System.out.printf("Error in WordData(%s , %s): Word Size (%d) doesn't match data size (%d)", word, data, word.length(), data.length);
+            System.out.printf("Error in WordData(%s , %s): Word Size (%d) doesn't match data size (%d)", word, data.toString(), word.length(), data.length);
             valid = false;
         }
 

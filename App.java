@@ -20,17 +20,24 @@ public class App {
 
         ValidityData validity = new ValidityData();
         
-        validity.addWord(new WordData("TARES", "BYBBB".toCharArray()));
-        validity.addWord(new WordData("BLACK", "BGYBB".toCharArray()));
-        validity.addWord(new WordData("ILIAD", "BGBYB".toCharArray()));
-        validity.addWord(new WordData("ALOHA", "GGYBB".toCharArray()));
+        validity.addWord(new WordData("A_A_Z", "YRGRY".toCharArray()));        
 
-        HashMap<String, TestWord> validWords = new HashMap<>();
-        for (TestWord word : words.values()) {
-            if(validity.isValid(word)){
-                validWords.put(word.getName(), word);
-            }
-        }
+        ProbabilityData probData = new ProbabilityData(validity);
+
+
+
+        
+        
+        // System.out.println(validity.getColoredValidityMap());
+
+        // HashMap<String, TestWord> validWords = new HashMap<>();
+        // for (TestWord word : words.values()) {
+        //     if(validity.isValid(word)){
+        //         validWords.put(word.getName(), word);
+        //     }
+        // }
+
+        
 
 
         System.out.println("Completed");

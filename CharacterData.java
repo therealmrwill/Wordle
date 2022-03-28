@@ -127,7 +127,15 @@ public class CharacterData {
         }
     }
 
-   
+    public void anotherGreenFound(int position){
+        if(testablePositions.contains(position)){
+            testablePositions.remove(position);
+        }
+
+        if(posValidity.get(position) == true){
+            posValidity.put(position, false);
+        }
+    }
 
     //* Override Methods - To String is mine, all others are computer generated
     @Override
@@ -183,6 +191,19 @@ public class CharacterData {
     public HashMap<Integer, Boolean> getPosValidity() {
         return posValidity;
     }
+    public Integer getNumPositionsStillValid(){
+        Integer dataOut = 0;
+
+        for(Integer position : this.posValidity.keySet()){
+            if(this.posValidity.get(position) == true){
+                dataOut += 1;
+            }
+        }
+
+        return dataOut;
+    }
+
+
     public String getData(String type){
         String dataOut = character + ": ";
 
@@ -235,6 +256,7 @@ public class CharacterData {
 
         return dataOut;
     }
+
     
 
     
